@@ -22,6 +22,7 @@ import ch.ivyteam.ivy.environment.Ivy;
 public class GeminiDataBean {
 	private String historyConservation;
 	private String inputedMessage;
+	private Model model;
 	private List<Content> requestContents;
 	private GeminiDataRequestService geminiDataRequestService = new GeminiDataRequestService();
 
@@ -35,7 +36,7 @@ public class GeminiDataBean {
 	public void onSendRequest() throws Exception {
 		Gson gson = new Gson();
 		Ivy.log().warn("inputed message" + inputedMessage);
-		historyConservation = geminiDataRequestService.sendRequestToGemini(inputedMessage, "user");
+		historyConservation = geminiDataRequestService.sendRequestToGemini(inputedMessage, "user", model);
 		String requestBodyFormat = String.format(jsonContent, historyConservation);
 		RequestRoot requestRoot = gson.fromJson(requestBodyFormat, RequestRoot.class);
 		requestContents = Optional.ofNullable(requestRoot).map(RequestRoot::getContents).orElse(new ArrayList<>());
@@ -45,6 +46,10 @@ public class GeminiDataBean {
 	public void onCleanText() {
 		init();
 		geminiDataRequestService.cleanData();
+	}
+
+	public Model[] onSelectModel() {
+		return Model.values();
 	}
 
 	public String getHistoryConservation() {
@@ -70,4 +75,13 @@ public class GeminiDataBean {
 	public void setInputedMessage(String inputedMessage) {
 		this.inputedMessage = inputedMessage;
 	}
+
+	public Model getModel() {
+		return model;
+	}
+
+	public void setModel(Model model) {
+		this.model = model;
+	}
+
 }

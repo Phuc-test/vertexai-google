@@ -40,11 +40,13 @@ public class GeminiDataRequestService {
 	private static final String PROJECT_ID = "generate-images-for-process";
 	private static final String LOCATION = "us-central1";
 	private static final String modelName = "gemini-1.5-pro-preview-0409";
+
 	public static final String IMG_TAG_PATTERN = "<img\\s+[^>]*>";
 	public static final String IMG_SRC_ATTR_PATTERN = "data:image\\/[^;]+;base64,([^\"]+)";
 
 	private static String historyContent = "";
-	private static final String ENDPOINT = "https://us-central1-aiplatform.googleapis.com/v1/projects/generate-images-for-process/locations/us-central1/publishers/google/models/gemini-1.5-pro-preview-0409:generateContent";
+	private static final String VERTEXAI_GEMINI_ENDPOINT = "https://us-central1-aiplatform.googleapis.com/v1/projects/generate-images-for-process/locations/us-central1/publishers/google/models/gemini-1.5-pro-preview-0409:generateContent";
+	private static final String GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=AIzaSyDaxbn4Ragu_cVsN26pY8tiaMIAZDQmxd4";
 
 	public static String getAccessToken() throws Exception {
 		GoogleCredentials credentials = ServiceAccountCredentials.fromStream(new FileInputStream(keyFilePath))
@@ -54,41 +56,38 @@ public class GeminiDataRequestService {
 	}
 
 	private static String formatRequest(String message, String role) {
-        String content = extractHtmlString(message);
-        List<String> imgTags = extractImgTagsFromArticleContent(content).stream().toList();
+		String content = extractHtmlString(message);
+		List<String> imgTags = extractImgTagsFromArticleContent(content).stream().toList();
 
-        if (ObjectUtils.isNotEmpty(imgTags)) {
-            String imageObjects = Strings.EMPTY;
-            for (String imgTag : imgTags) {
-                String imageBase64 = extractImgAttribute(imgTag);
-                String mapToImageFormat = String.format(imageInput, imageBase64);
-                imageObjects = StringUtils.isEmpty(imageObjects) ? mapToImageFormat
-                        : String.join(",", imageObjects, imageObjects);
-                content = content.replace(imgTag, "");
-            }
-            return String.format(textAndImageInput, role, content.trim(), imageObjects);
-        }
-        return String.format(onlyTextInput, role, content);
+		if (ObjectUtils.isNotEmpty(imgTags)) {
+			String imageObjects = Strings.EMPTY;
+			for (String imgTag : imgTags) {
+				String imageBase64 = extractImgAttribute(imgTag);
+				String mapToImageFormat = String.format(imageInput, imageBase64);
+				imageObjects = StringUtils.isEmpty(imageObjects) ? mapToImageFormat
+						: String.join(COMMA, imageObjects, imageObjects);
+				content = content.replace(imgTag, "");
+			}
+			return String.format(textAndImageInput, role, content.trim(), imageObjects);
+		}
+		return String.format(onlyTextInput, role, content);
 	}
 
 	private String createRequestBody(String message, String role) {
 		String requestContent = formatRequest(message, role);
 		historyContent = StringUtils.isEmpty(historyContent) ? requestContent
-				: String.join(",", historyContent, requestContent);
+				: String.join(COMMA, historyContent, requestContent);
 
 		return String.format(jsonContent, historyContent);
 	}
 
-	public String sendRequestToGemini(String message, String role) throws Exception {
+	public String sendRequestToGemini(String message, String role, Model platFormModel) throws Exception {
 		String bodyRequestContent = createRequestBody(message, role);
 		Ivy.log().warn("bodyRequestContent ne " + bodyRequestContent);
-		String accessToken = getAccessToken();
 		// Create HTTP client
 		HttpClient client = HttpClient.newHttpClient();
 		// Build request
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(ENDPOINT))
-				.header("Authorization", "Bearer " + accessToken).header("Content-Type", "application/json")
-				.POST(HttpRequest.BodyPublishers.ofString(bodyRequestContent)).build();
+		HttpRequest request = generateHttpRequestBasedOnModel(platFormModel, bodyRequestContent);
 
 		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
@@ -137,5 +136,19 @@ public class GeminiDataRequestService {
 		Document doc = Jsoup.parse(htmlContent);
 		Elements content = doc.select("p");
 		return content.stream().map(Element::html).collect(Collectors.joining(" "));
+	}
+
+	private HttpRequest generateHttpRequestBasedOnModel(Model platformModel, String bodyRequestContent)
+			throws Exception {
+
+		if (platformModel == Model.VERTEXAI_GEMINI) {
+			String accessToken = getAccessToken();
+			HttpRequest request = HttpRequest.newBuilder().uri(URI.create(VERTEXAI_GEMINI_ENDPOINT))
+					.header("Authorization", "Bearer " + accessToken).header("Content-Type", "application/json")
+					.POST(HttpRequest.BodyPublishers.ofString(bodyRequestContent)).build();
+			return request;
+		}
+		return HttpRequest.newBuilder().uri(URI.create(GEMINI_ENDPOINT)).header("Content-Type", "application/json")
+				.POST(HttpRequest.BodyPublishers.ofString(bodyRequestContent)).build();
 	}
 }

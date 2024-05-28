@@ -14,8 +14,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>vertexai.connector</groupId>
-      <artifactId>vertexai-connector</artifactId>
+      <groupId>com.axonivy.connector.vertexai</groupId>
+      <artifactId>vertexai-google</artifactId>
       <version>${project.version}</version>
       <type>iar</type>
     </dependency>

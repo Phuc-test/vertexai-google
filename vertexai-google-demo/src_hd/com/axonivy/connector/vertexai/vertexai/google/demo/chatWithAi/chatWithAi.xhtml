@@ -12,7 +12,13 @@
 		<ui:define name="content">
 			<h3>AI Chat</h3>
 			<h:form id="form">
-				<p:messages />
+				<div>
+					<p:outputLabel for="option" value="Model" />
+					<p:selectOneMenu id="option" value="#{managedBean.model}">
+						<f:selectItems value="#{managedBean.onSelectModel()}" var="type"
+							itemLabel="#{type.getName()}" itemValue="#{type}" />
+					</p:selectOneMenu>
+				</div>
 				<p:panelGrid columns="1" layout="grid"
 					styleClass="ui-panelgrid-blank ui-fluid">
 
@@ -37,9 +43,6 @@
 						<f:facet name="toolbar">
 							<span class="ql-formats">
 								<button class="ql-image"></button>
-							</span>
-							<span class="ql-formats"> <select class="ql-font"></select>
-								<select class="ql-size"></select>
 							</span>
 						</f:facet>
 					</p:textEditor>
