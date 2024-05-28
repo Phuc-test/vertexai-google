@@ -8,6 +8,11 @@ public class InlineData {
 
 	@SerializedName("data")
 	private String base64Data;
+	
+    public InlineData(String type, String base64Data) {
+        this.type = type;
+        this.base64Data = base64Data;
+    }
 
 	public String getType() {
 		return type;

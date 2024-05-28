@@ -5,5 +5,13 @@
 # add an additional ‘variables.yaml’ file in a subdirectory in the ‘Config’ folder: 
 # '<project>/Config/_<environment>/variables.yaml
 #
+
 Variables:
-#  myVariable: value
+  gemini:
+    apiKey: 'AIzaSyDaxbn4Ragu_cVsN26pY8tiaMIAZDQmxd4'
+  vertexai-gemini:
+    projectId: 'generate-images-for-process'
+    location: 'us-central1'
+    modelName: 'gemini-1.5-pro-preview-0409'
+    keyFilePath: 'D:\\generate-images-for-process-27dba695f5f5.json'
+

@@ -5,6 +5,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -16,78 +18,72 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.gson.Gson;
-
 import ch.ivyteam.ivy.environment.Ivy;
 import com.axonivy.connector.vertexai.entities.*;
 
-import static com.axonivy.connector.vertexai.Constants.*;
-
 public class GeminiDataRequestService {
 
-	private static final String keyFilePath = "D:\\generate-images-for-process-27dba695f5f5.json";
 	private static final List<String> vertexAiScopes = List.of("https://www.googleapis.com/auth/cloud-platform");
-	private static final String PROJECT_ID = "generate-images-for-process";
-	private static final String LOCATION = "us-central1";
-	private static final String modelName = "gemini-1.5-pro-preview-0409";
+	private static final String VERTEX_PROJECT_ID = Ivy.var().get("vertexai-gemini.projectId");
+	private static final String VERTEX_LOCATION = Ivy.var().get("vertexai-gemini.location");
+	private static final String VERTEX_MODEL_NAME = Ivy.var().get("vertexai-gemini.modelName");
+	private static final String VERTEX_KEY_FILE_PATH = Ivy.var().get("vertexai-gemini.keyFilePath");
+	private static final String GEMINI_KEY = Ivy.var().get("gemini.apiKey");
 
 	public static final String IMG_TAG_PATTERN = "<img\\s+[^>]*>";
 	public static final String IMG_SRC_ATTR_PATTERN = "data:image\\/[^;]+;base64,([^\"]+)";
 
-	private static String historyContent = "";
-	private static final String VERTEXAI_GEMINI_ENDPOINT = "https://us-central1-aiplatform.googleapis.com/v1/projects/generate-images-for-process/locations/us-central1/publishers/google/models/gemini-1.5-pro-preview-0409:generateContent";
-	private static final String GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=AIzaSyDaxbn4Ragu_cVsN26pY8tiaMIAZDQmxd4";
+	private static List<Content> historyContent = new ArrayList<>();
+	private static final String VERTEX_URL = "https://{0}-aiplatform.googleapis.com/v1/projects/{1}/locations/{0}/publishers/google/models/{2}:generateContent";
+	private static final String GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key={0}";
 
 	public static String getAccessToken() throws Exception {
-		GoogleCredentials credentials = ServiceAccountCredentials.fromStream(new FileInputStream(keyFilePath))
+		GoogleCredentials credentials = ServiceAccountCredentials.fromStream(new FileInputStream(VERTEX_KEY_FILE_PATH))
 				.createScoped(vertexAiScopes);
 		AccessToken token = credentials.refreshAccessToken();
 		return token.getTokenValue();
 	}
 
-	private static String formatRequest(String message, String role) {
+	private static Content formatRequest(String message) {
 		String content = extractHtmlString(message);
 		List<String> imgTags = extractImgTagsFromArticleContent(content).stream().toList();
-
 		if (ObjectUtils.isNotEmpty(imgTags)) {
-			String imageObjects = Strings.EMPTY;
+			List<Part> parts = new ArrayList<>();
 			for (String imgTag : imgTags) {
+				content = content.replace(imgTag, Strings.EMPTY);
 				String imageBase64 = extractImgAttribute(imgTag);
-				String mapToImageFormat = String.format(imageInput, imageBase64);
-				imageObjects = StringUtils.isEmpty(imageObjects) ? mapToImageFormat
-						: String.join(COMMA, imageObjects, imageObjects);
-				content = content.replace(imgTag, "");
+				InlineData inlineData = new InlineData("image/jpeg", imageBase64);
+				Part currentPart = new Part(inlineData);
+				parts.add(currentPart);
 			}
-			return String.format(textAndImageInput, role, content.trim(), imageObjects);
+			parts.add(0, new Part(content.trim()));
+			return new Content(Role.USER.getName(), parts);
 		}
-		return String.format(onlyTextInput, role, content);
+		Part currentPart = new Part(content.trim());
+		return new Content(Role.USER.getName(), List.of(currentPart));
 	}
 
-	private String createRequestBody(String message, String role) {
-		String requestContent = formatRequest(message, role);
-		historyContent = StringUtils.isEmpty(historyContent) ? requestContent
-				: String.join(COMMA, historyContent, requestContent);
-
-		return String.format(jsonContent, historyContent);
+	private static RequestRoot createRequestBody(String message) {
+		Content requestContent = formatRequest(message);
+		historyContent.add(requestContent);
+		return new RequestRoot(historyContent);
 	}
 
-	public String sendRequestToGemini(String message, String role, Model platFormModel) throws Exception {
-		String bodyRequestContent = createRequestBody(message, role);
-		Ivy.log().warn("bodyRequestContent ne " + bodyRequestContent);
+	public RequestRoot sendRequestToGemini(String message, Model platFormModel) throws Exception {
+		RequestRoot bodyRequestContent = createRequestBody(message);
 		// Create HTTP client
 		HttpClient client = HttpClient.newHttpClient();
 		// Build request
-		HttpRequest request = generateHttpRequestBasedOnModel(platFormModel, bodyRequestContent);
+		HttpRequest request = generateHttpRequestBasedOnModel(platFormModel, new Gson().toJson(bodyRequestContent));
 
 		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
@@ -95,20 +91,32 @@ public class GeminiDataRequestService {
 			// Handle response
 			Gson gson = new Gson();
 			ResponseRoot responseRoot = gson.fromJson(response.body(), ResponseRoot.class);
-			String multiTurnResponse = Optional.ofNullable(responseRoot).map(ResponseRoot::getCandidates)
+			Content contentResponse = Optional.ofNullable(responseRoot).map(ResponseRoot::getCandidates)
 					.map(Collection::stream).flatMap(Stream::findFirst).map(Candidate::getContent)
 					.map(Content::getParts).map(Collection::stream).flatMap(Stream::findFirst).map(Part::getText)
-					.map(gson::toJson).map(text -> String.format(onlyTextOutput, "model", text)).orElse("");
-			historyContent = String.join(COMMA, historyContent, multiTurnResponse);
+					.map(text -> {
+						Part currentPart = new Part(text.trim());
+						return new Content(Role.MODEL.getName(), List.of(currentPart));
+					}).orElse(null);
+			historyContent.add(contentResponse);
+		} else if (response.statusCode() == 429) {
+			Ivy.log().error("Request failed: " + response.statusCode());
+			Ivy.log().error(response.body());
+			Part currentPart = new Part("The server is now overloaded. Please try again later");
+			Content contentResponse = new Content(Role.MODEL.getName(), List.of(currentPart));
+			historyContent.add(contentResponse);
 		} else {
 			Ivy.log().error("Request failed: " + response.statusCode());
 			Ivy.log().error(response.body());
+			Part currentPart = new Part("There are some issue in server. Please try again later");
+			Content contentResponse = new Content(Role.MODEL.getName(), List.of(currentPart));
+			historyContent.add(contentResponse);
 		}
-		return historyContent;
+		return new RequestRoot(historyContent);
 	}
 
 	public void cleanData() {
-		historyContent = Strings.EMPTY;
+		historyContent = new ArrayList<>();
 	}
 
 	private static Set<String> extractImgTagsFromArticleContent(String content) {
@@ -140,14 +148,15 @@ public class GeminiDataRequestService {
 
 	private HttpRequest generateHttpRequestBasedOnModel(Model platformModel, String bodyRequestContent)
 			throws Exception {
-
 		if (platformModel == Model.VERTEXAI_GEMINI) {
 			String accessToken = getAccessToken();
-			HttpRequest request = HttpRequest.newBuilder().uri(URI.create(VERTEXAI_GEMINI_ENDPOINT))
+			String VERTEXAI_GEMINI_ENDPOINT = MessageFormat.format(VERTEX_URL, VERTEX_LOCATION, VERTEX_PROJECT_ID,
+					VERTEX_MODEL_NAME);
+			return HttpRequest.newBuilder().uri(URI.create(VERTEXAI_GEMINI_ENDPOINT))
 					.header("Authorization", "Bearer " + accessToken).header("Content-Type", "application/json")
 					.POST(HttpRequest.BodyPublishers.ofString(bodyRequestContent)).build();
-			return request;
 		}
+		String GEMINI_ENDPOINT = MessageFormat.format(GEMINI_URL, GEMINI_KEY);
 		return HttpRequest.newBuilder().uri(URI.create(GEMINI_ENDPOINT)).header("Content-Type", "application/json")
 				.POST(HttpRequest.BodyPublishers.ofString(bodyRequestContent)).build();
 	}

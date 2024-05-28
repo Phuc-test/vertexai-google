@@ -8,6 +8,10 @@ public class RequestRoot {
 	@SerializedName("contents")
 	List<Content> contents;
 
+	public RequestRoot(List<Content> contents) {
+		this.contents = contents;
+	}
+
 	public List<Content> getContents() {
 		return contents;
 	}

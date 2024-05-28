@@ -10,6 +10,14 @@ public class Part {
 	@SerializedName("inline_data")
 	private InlineData inlineData;
 
+    public Part(String text) {
+        this.text = text;
+    }
+
+    public Part(InlineData inlineData) {
+        this.inlineData = inlineData;
+    }
+    
 	public String getText() {
 		return text;
 	}

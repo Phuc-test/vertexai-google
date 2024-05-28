@@ -10,6 +10,11 @@ public class Content {
 	@SerializedName("parts")
 	private List<Part> parts;
 
+	public Content(String role, List<Part> parts) {
+		this.role = role;
+		this.parts = parts;
+	}
+
 	public String getRole() {
 		return role;
 	}

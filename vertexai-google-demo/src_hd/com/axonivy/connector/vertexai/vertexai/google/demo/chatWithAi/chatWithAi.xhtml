@@ -21,18 +21,17 @@
 				</div>
 				<p:panelGrid columns="1" layout="grid"
 					styleClass="ui-panelgrid-blank ui-fluid">
-
 					<ui:repeat var="content" value="#{managedBean.requestContents}">
 						<p:panel rendered="#{content.role == 'user'}">
-							<p:outputLabel value="#{content.role}" style="font-weight:bold;" />
-							<p:outputLabel value="#{content.parts.get(0).text}"
+							<h:outputText value="#{content.role}" style="font-weight:bold;" />
+							<h:outputText value="#{content.parts.get(0).text}" escape="false"
 								style="white-space: pre-line; display:block; margin-bottom:20px;" />
 						</p:panel>
 
 						<p:panel rendered="#{content.role == 'model'}">
-							<p:outputLabel value="#{content.role}"
+							<h:outputText value="#{content.role}"
 								style="font-weight:bold; color: red" />
-							<p:outputLabel value="#{content.parts.get(0).text}"
+							<h:outputText value="#{content.parts.get(0).text}"
 								style="white-space: pre-line; display:block; margin-bottom:20px;" />
 						</p:panel>
 					</ui:repeat>

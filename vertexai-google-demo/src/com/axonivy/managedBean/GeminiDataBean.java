@@ -9,38 +9,30 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.util.Strings;
-
 import com.axonivy.connector.vertexai.entities.*;
 import com.axonivy.connector.vertexai.service.GeminiDataRequestService;
-import com.google.gson.Gson;
-import static com.axonivy.connector.vertexai.Constants.jsonContent;
+
 import ch.ivyteam.ivy.environment.Ivy;
 
 @ManagedBean
 @ViewScoped
 public class GeminiDataBean {
-	private String historyConservation;
-	private String inputedMessage;
+	private String inputtedMessage;
 	private Model model;
 	private List<Content> requestContents;
 	private GeminiDataRequestService geminiDataRequestService = new GeminiDataRequestService();
 
 	@PostConstruct
 	public void init() {
-		historyConservation = Strings.EMPTY;
 		requestContents = new ArrayList<>();
 		geminiDataRequestService.cleanData();
 	}
 
 	public void onSendRequest() throws Exception {
-		Gson gson = new Gson();
-		Ivy.log().warn("inputed message" + inputedMessage);
-		historyConservation = geminiDataRequestService.sendRequestToGemini(inputedMessage, "user", model);
-		String requestBodyFormat = String.format(jsonContent, historyConservation);
-		RequestRoot requestRoot = gson.fromJson(requestBodyFormat, RequestRoot.class);
+		Ivy.log().warn(inputtedMessage);
+		RequestRoot requestRoot = geminiDataRequestService.sendRequestToGemini(inputtedMessage, model);
 		requestContents = Optional.ofNullable(requestRoot).map(RequestRoot::getContents).orElse(new ArrayList<>());
-		inputedMessage = StringUtils.EMPTY;
+		inputtedMessage = StringUtils.EMPTY;
 	}
 
 	public void onCleanText() {
@@ -52,14 +44,6 @@ public class GeminiDataBean {
 		return Model.values();
 	}
 
-	public String getHistoryConservation() {
-		return historyConservation;
-	}
-
-	public void setHistoryConservation(String historyConservation) {
-		this.historyConservation = historyConservation;
-	}
-
 	public List<Content> getRequestContents() {
 		return requestContents;
 	}
@@ -69,11 +53,11 @@ public class GeminiDataBean {
 	}
 
 	public String getInputedMessage() {
-		return inputedMessage;
+		return inputtedMessage;
 	}
 
 	public void setInputedMessage(String inputedMessage) {
-		this.inputedMessage = inputedMessage;
+		this.inputtedMessage = inputedMessage;
 	}
 
 	public Model getModel() {
