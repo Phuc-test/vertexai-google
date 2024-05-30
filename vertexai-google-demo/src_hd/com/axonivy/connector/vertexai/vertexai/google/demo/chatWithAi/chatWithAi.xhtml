@@ -21,22 +21,22 @@
 				</div>
 				<p:panelGrid columns="1" layout="grid"
 					styleClass="ui-panelgrid-blank ui-fluid">
-					<ui:repeat var="content" value="#{managedBean.requestContents}">
-						<p:panel rendered="#{content.role == 'user'}">
-							<h:outputText value="#{content.role}" style="font-weight:bold;" />
-							<h:outputText value="#{content.parts.get(0).text}" escape="false"
+					<ui:repeat var="conversation" value="#{managedBean.conversations}">
+						<p:panel rendered="#{conversation.role == 'user'}">
+							<h:outputText value="#{conversation.role}" style="font-weight:bold;" />
+							<h:outputText value="#{conversation.text}" escape="false"
 								style="white-space: pre-line; display:block; margin-bottom:20px;" />
 						</p:panel>
 
-						<p:panel rendered="#{content.role == 'model'}">
-							<h:outputText value="#{content.role}"
+						<p:panel rendered="#{conversation.role == 'model'}">
+							<h:outputText value="#{conversation.role}"
 								style="font-weight:bold; color: red" />
-							<h:outputText value="#{content.parts.get(0).text}"
+							<h:outputText value="#{conversation.text}"
 								style="white-space: pre-line; display:block; margin-bottom:20px;" />
 						</p:panel>
 					</ui:repeat>
 					<p:textEditor widgetVar="editor" id="editor"
-						value="#{managedBean.inputedMessage}" allowImages="true"
+						value="#{managedBean.inputtedMessage}" allowImages="true"
 						height="150" style="margin-bottom:10px"
 						placeholder="How can I help you today?">
 						<f:facet name="toolbar">
@@ -45,8 +45,6 @@
 							</span>
 						</f:facet>
 					</p:textEditor>
-
-
 				</p:panelGrid>
 				<br />
 				<div class="command-btns">
@@ -86,5 +84,4 @@
 		</ui:define>
 	</ui:composition>
 </h:body>
-
 </html>

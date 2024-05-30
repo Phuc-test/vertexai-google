@@ -2,12 +2,9 @@ package com.axonivy.managedBean;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-
 import org.apache.commons.lang3.StringUtils;
 import com.axonivy.connector.vertexai.entities.*;
 import com.axonivy.connector.vertexai.service.GeminiDataRequestService;
@@ -19,19 +16,18 @@ import ch.ivyteam.ivy.environment.Ivy;
 public class GeminiDataBean {
 	private String inputtedMessage;
 	private Model model;
-	private List<Content> requestContents;
+	private List<Conversation> conversations;
 	private GeminiDataRequestService geminiDataRequestService = new GeminiDataRequestService();
 
 	@PostConstruct
 	public void init() {
-		requestContents = new ArrayList<>();
+		conversations = new ArrayList<>();
 		geminiDataRequestService.cleanData();
 	}
 
 	public void onSendRequest() throws Exception {
 		Ivy.log().warn(inputtedMessage);
-		RequestRoot requestRoot = geminiDataRequestService.sendRequestToGemini(inputtedMessage, model);
-		requestContents = Optional.ofNullable(requestRoot).map(RequestRoot::getContents).orElse(new ArrayList<>());
+		conversations = geminiDataRequestService.sendRequestToGemini(inputtedMessage, model);
 		inputtedMessage = StringUtils.EMPTY;
 	}
 
@@ -44,20 +40,12 @@ public class GeminiDataBean {
 		return Model.values();
 	}
 
-	public List<Content> getRequestContents() {
-		return requestContents;
-	}
-
-	public void setRequestContents(List<Content> requestContents) {
-		this.requestContents = requestContents;
-	}
-
-	public String getInputedMessage() {
+	public String getInputtedMessage() {
 		return inputtedMessage;
 	}
 
-	public void setInputedMessage(String inputedMessage) {
-		this.inputtedMessage = inputedMessage;
+	public void setInputtedMessage(String inputtedMessage) {
+		this.inputtedMessage = inputtedMessage;
 	}
 
 	public Model getModel() {
@@ -68,4 +56,11 @@ public class GeminiDataBean {
 		this.model = model;
 	}
 
+	public List<Conversation> getConversations() {
+		return conversations;
+	}
+
+	public void setConversations(List<Conversation> conversations) {
+		this.conversations = conversations;
+	}
 }

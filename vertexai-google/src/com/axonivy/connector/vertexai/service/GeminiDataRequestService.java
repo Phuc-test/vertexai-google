@@ -43,6 +43,7 @@ public class GeminiDataRequestService {
 	public static final String IMG_SRC_ATTR_PATTERN = "data:image\\/[^;]+;base64,([^\"]+)";
 
 	private static List<Content> historyContent = new ArrayList<>();
+	private static List<Conversation> conversations = new ArrayList<>();
 	private static final String VERTEX_URL = "https://{0}-aiplatform.googleapis.com/v1/projects/{1}/locations/{0}/publishers/google/models/{2}:generateContent";
 	private static final String GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key={0}";
 
@@ -74,11 +75,12 @@ public class GeminiDataRequestService {
 
 	private static RequestRoot createRequestBody(String message) {
 		Content requestContent = formatRequest(message);
+		conversations.add(new Conversation(Role.USER.getName(), message));
 		historyContent.add(requestContent);
 		return new RequestRoot(historyContent);
 	}
 
-	public RequestRoot sendRequestToGemini(String message, Model platFormModel) throws Exception {
+	public List<Conversation> sendRequestToGemini(String message, Model platFormModel) throws Exception {
 		RequestRoot bodyRequestContent = createRequestBody(message);
 		// Create HTTP client
 		HttpClient client = HttpClient.newHttpClient();
@@ -95,6 +97,7 @@ public class GeminiDataRequestService {
 					.map(Collection::stream).flatMap(Stream::findFirst).map(Candidate::getContent)
 					.map(Content::getParts).map(Collection::stream).flatMap(Stream::findFirst).map(Part::getText)
 					.map(text -> {
+						conversations.add(new Conversation(Role.MODEL.getName(), text.trim()));
 						Part currentPart = new Part(text.trim());
 						return new Content(Role.MODEL.getName(), List.of(currentPart));
 					}).orElse(null);
@@ -105,18 +108,23 @@ public class GeminiDataRequestService {
 			Part currentPart = new Part("The server is now overloaded. Please try again later");
 			Content contentResponse = new Content(Role.MODEL.getName(), List.of(currentPart));
 			historyContent.add(contentResponse);
+			conversations.add(
+					new Conversation(Role.MODEL.getName(), "The server is now overloaded. Please try again later"));
 		} else {
 			Ivy.log().error("Request failed: " + response.statusCode());
 			Ivy.log().error(response.body());
 			Part currentPart = new Part("There are some issue in server. Please try again later");
 			Content contentResponse = new Content(Role.MODEL.getName(), List.of(currentPart));
 			historyContent.add(contentResponse);
+			conversations.add(
+					new Conversation(Role.MODEL.getName(), "There are some issue in server. Please try again later"));
 		}
-		return new RequestRoot(historyContent);
+		return conversations;
 	}
 
 	public void cleanData() {
 		historyContent = new ArrayList<>();
+		conversations = new ArrayList<>();
 	}
 
 	private static Set<String> extractImgTagsFromArticleContent(String content) {
