@@ -9,8 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import com.axonivy.connector.vertexai.entities.*;
 import com.axonivy.connector.vertexai.service.GeminiDataRequestService;
 
-import ch.ivyteam.ivy.environment.Ivy;
-
 @ManagedBean
 @ViewScoped
 public class GeminiDataBean {
@@ -26,7 +24,6 @@ public class GeminiDataBean {
 	}
 
 	public void onSendRequest() throws Exception {
-		Ivy.log().warn(inputtedMessage);
 		conversations = geminiDataRequestService.sendRequestToGemini(inputtedMessage, model);
 		inputtedMessage = StringUtils.EMPTY;
 	}

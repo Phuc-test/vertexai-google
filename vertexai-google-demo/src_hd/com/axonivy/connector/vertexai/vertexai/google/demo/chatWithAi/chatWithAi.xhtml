@@ -5,48 +5,50 @@
 	xmlns:ic="http://ivyteam.ch/jsf/component"
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:pe="http://primefaces.org/ui/extensions">
+
 <h:body>
 	<ui:composition template="/layouts/basic-10.xhtml">
 		<ui:param name="managedBean" value="#{geminiDataBean}" />
 		<ui:define name="title">ChatWithAi</ui:define>
 		<ui:define name="content">
 			<h3>AI Chat</h3>
-			<h:form id="form">
-				<div>
-					<p:outputLabel for="option" value="Model" />
-					<p:selectOneMenu id="option" value="#{managedBean.model}">
-						<f:selectItems value="#{managedBean.onSelectModel()}" var="type"
-							itemLabel="#{type.getName()}" itemValue="#{type}" />
-					</p:selectOneMenu>
-				</div>
+			<h:form id="form" styleClass="form-container">
 				<p:panelGrid columns="1" layout="grid"
-					styleClass="ui-panelgrid-blank ui-fluid">
+					styleClass="ui-panelgrid-blank ui-noborder">
+					<div id="model-option">
+						<p:outputLabel for="option" value="Model:" />
+						<p:selectOneMenu id="option" value="#{managedBean.model}"
+							autoWidth="false" style="width: 150px;">
+							<f:selectItems value="#{managedBean.onSelectModel()}" var="type"
+								itemLabel="#{type.getName()}" itemValue="#{type}" />
+						</p:selectOneMenu>
+					</div>
 					<ui:repeat var="conversation" value="#{managedBean.conversations}">
-						<p:panel rendered="#{conversation.role == 'user'}">
-							<h:outputText value="#{conversation.role}" style="font-weight:bold;" />
+						<p:panel rendered="#{conversation.role == 'user'}"
+							styleClass="model-panel ui-fluid" style="text-align:right;">
+							<h:outputText value="#{ivy.session.sessionUser.displayName}"
+								style="font-weight:bold;" />
 							<h:outputText value="#{conversation.text}" escape="false"
 								style="white-space: pre-line; display:block; margin-bottom:20px;" />
 						</p:panel>
 
-						<p:panel rendered="#{conversation.role == 'model'}">
+						<p:panel rendered="#{conversation.role == 'model'}"
+							styleClass="ui-fluid">
 							<h:outputText value="#{conversation.role}"
 								style="font-weight:bold; color: red" />
 							<h:outputText value="#{conversation.text}"
 								style="white-space: pre-line; display:block; margin-bottom:20px;" />
 						</p:panel>
 					</ui:repeat>
+
 					<p:textEditor widgetVar="editor" id="editor"
 						value="#{managedBean.inputtedMessage}" allowImages="true"
-						height="150" style="margin-bottom:10px"
+						required="true" toolbarVisible="false" height="100"
+						requiredMessage="This field is required"
 						placeholder="How can I help you today?">
-						<f:facet name="toolbar">
-							<span class="ql-formats">
-								<button class="ql-image"></button>
-							</span>
-						</f:facet>
 					</p:textEditor>
+					<p:messages id="messages" closable="true" for="editor" />
 				</p:panelGrid>
-				<br />
 				<div class="command-btns">
 					<p:commandButton id="refresh" value="refresh" update="form"
 						actionListener="#{managedBean.onCleanText()}" icon="pi pi-refresh" />
@@ -54,7 +56,8 @@
 						actionListener="#{managedBean.onSendRequest()}" icon="pi pi-check" />
 				</div>
 			</h:form>
-			<script type="text/javascript">
+
+			<script type="text/javascript">	    
 				 function handlePaste(event) {
 				 	var clipboardData = event.clipboardData || window.clipboardData;
             		var items = clipboardData.items;
