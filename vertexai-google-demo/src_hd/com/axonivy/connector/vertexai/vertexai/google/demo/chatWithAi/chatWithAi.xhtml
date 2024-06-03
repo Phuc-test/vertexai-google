@@ -43,7 +43,7 @@
 
 					<p:textEditor widgetVar="editor" id="editor"
 						value="#{managedBean.inputtedMessage}" allowImages="true"
-						required="true" toolbarVisible="false" height="100"
+						toolbarVisible="false" height="100"
 						requiredMessage="This field is required"
 						placeholder="How can I help you today?">
 					</p:textEditor>
@@ -59,6 +59,7 @@
 
 			<script type="text/javascript">	    
 				 function handlePaste(event) {
+				 	event.preventDefault();
 				 	var clipboardData = event.clipboardData || window.clipboardData;
             		var items = clipboardData.items;
 	            	for (var i = 0; i &lt; items.length; i++) {
@@ -80,8 +81,7 @@
 	   
         		}
         		document.addEventListener('paste', function(event) {
-		            var editor = PF('editor').editor.root;      
-		                handlePaste(event);
+		           handlePaste(event);
 		        });
 			</script>
 		</ui:define>

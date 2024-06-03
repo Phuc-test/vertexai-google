@@ -35,36 +35,5 @@
         "at" : { "x" : 264, "y" : 64 }
       },
       "connect" : { "id" : "f2", "to" : "f1" }
-    }, {
-      "id" : "f5",
-      "type" : "RequestStart",
-      "name" : "UsingFileUpload",
-      "config" : {
-        "callSignature" : "UsingFileUpload",
-        "outLink" : "UsingFileUpload.ivp",
-        "case" : { }
-      },
-      "visual" : {
-        "at" : { "x" : 120, "y" : 192 }
-      },
-      "connect" : { "id" : "f9", "to" : "f8" }
-    }, {
-      "id" : "f7",
-      "type" : "TaskEnd",
-      "visual" : {
-        "at" : { "x" : 400, "y" : 192 }
-      }
-    }, {
-      "id" : "f8",
-      "type" : "DialogCall",
-      "name" : "chatWithAi2",
-      "config" : {
-        "dialogId" : "com.axonivy.connector.vertexai.vertexai.google.demo.chatWithAi2",
-        "startMethod" : "start()"
-      },
-      "visual" : {
-        "at" : { "x" : 248, "y" : 192 }
-      },
-      "connect" : { "id" : "f6", "to" : "f7" }
     } ]
 }
