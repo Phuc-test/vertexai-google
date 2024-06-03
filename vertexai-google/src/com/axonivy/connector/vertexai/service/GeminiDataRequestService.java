@@ -1,6 +1,7 @@
 package com.axonivy.connector.vertexai.service;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -47,7 +48,7 @@ public class GeminiDataRequestService {
 	private static final String VERTEX_URL = "https://{0}-aiplatform.googleapis.com/v1/projects/{1}/locations/{0}/publishers/google/models/{2}:generateContent";
 	private static final String GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key={0}";
 
-	public static String getAccessToken() throws Exception {
+	public static String getAccessToken() throws IOException {
 		GoogleCredentials credentials = ServiceAccountCredentials.fromStream(new FileInputStream(VERTEX_KEY_FILE_PATH))
 				.createScoped(vertexAiScopes);
 		AccessToken token = credentials.refreshAccessToken();
@@ -80,11 +81,13 @@ public class GeminiDataRequestService {
 		return new RequestRoot(historyContent);
 	}
 
-	public List<Conversation> sendRequestToGemini(String message, Model platFormModel) throws Exception {
+	public List<Conversation> sendRequestToGemini(String message, Model platFormModel)
+			throws IOException, InterruptedException {
 		RequestRoot bodyRequestContent = createRequestBody(message);
 		// Create HTTP client
 		HttpClient client = HttpClient.newHttpClient();
 		// Build request
+		
 		HttpRequest request = generateHttpRequestBasedOnModel(platFormModel, new Gson().toJson(bodyRequestContent));
 
 		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -155,7 +158,7 @@ public class GeminiDataRequestService {
 	}
 
 	private HttpRequest generateHttpRequestBasedOnModel(Model platformModel, String bodyRequestContent)
-			throws Exception {
+			throws IOException {
 		if (platformModel == Model.VERTEXAI_GEMINI) {
 			String accessToken = getAccessToken();
 			String VERTEXAI_GEMINI_ENDPOINT = MessageFormat.format(VERTEX_URL, VERTEX_LOCATION, VERTEX_PROJECT_ID,

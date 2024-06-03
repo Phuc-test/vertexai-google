@@ -59,11 +59,11 @@
 
 			<script type="text/javascript">	    
 				 function handlePaste(event) {
-				 	event.preventDefault();
 				 	var clipboardData = event.clipboardData || window.clipboardData;
             		var items = clipboardData.items;
 	            	for (var i = 0; i &lt; items.length; i++) {
 	            		if (items[i].type.indexOf('image') !== -1) {
+	            			event.preventDefault();
 		                    var file = items[i].getAsFile();
 		                    var reader = new FileReader();
 		
