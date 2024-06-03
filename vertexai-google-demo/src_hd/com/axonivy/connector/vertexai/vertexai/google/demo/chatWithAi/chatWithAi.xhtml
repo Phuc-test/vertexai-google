@@ -40,15 +40,19 @@
 								style="white-space: pre-line; display:block; margin-bottom:20px;" />
 						</p:panel>
 					</ui:repeat>
+				</p:panelGrid>
 
+				<div id="article-content" class="ui-fluid">
 					<p:textEditor widgetVar="editor" id="editor"
 						value="#{managedBean.inputtedMessage}" allowImages="true"
 						toolbarVisible="false" height="100"
 						requiredMessage="This field is required"
 						placeholder="How can I help you today?">
+						<f:validator validatorId="commonValidator" />
 					</p:textEditor>
 					<p:messages id="messages" closable="true" for="editor" />
-				</p:panelGrid>
+				</div>
+				<br/>
 				<div class="command-btns">
 					<p:commandButton id="refresh" value="refresh" update="form"
 						actionListener="#{managedBean.onCleanText()}" icon="pi pi-refresh" />
