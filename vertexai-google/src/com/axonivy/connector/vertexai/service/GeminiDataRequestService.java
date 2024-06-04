@@ -33,29 +33,30 @@ import com.axonivy.connector.vertexai.entities.*;
 
 public class GeminiDataRequestService {
 
-	private static final List<String> vertexAiScopes = List.of("https://www.googleapis.com/auth/cloud-platform");
-	private static final String VERTEX_PROJECT_ID = Ivy.var().get("vertexai-gemini.projectId");
-	private static final String VERTEX_LOCATION = Ivy.var().get("vertexai-gemini.location");
-	private static final String VERTEX_MODEL_NAME = Ivy.var().get("vertexai-gemini.modelName");
-	private static final String VERTEX_KEY_FILE_PATH = Ivy.var().get("vertexai-gemini.keyFilePath");
-	private static final String GEMINI_KEY = Ivy.var().get("gemini.apiKey");
+	public static String VERTEX_PROJECT_ID = Ivy.var().get("vertexai-gemini.projectId");
+	public static String VERTEX_LOCATION = Ivy.var().get("vertexai-gemini.location");
+	public static String VERTEX_MODEL_NAME = Ivy.var().get("vertexai-gemini.modelName");
+	public static String VERTEX_KEY_FILE_PATH = Ivy.var().get("vertexai-gemini.keyFilePath");
+	public static String GEMINI_KEY = Ivy.var().get("gemini.apiKey");
 
 	public static final String IMG_TAG_PATTERN = "<img\\s+[^>]*>";
 	public static final String IMG_SRC_ATTR_PATTERN = "data:image\\/[^;]+;base64,([^\"]+)";
-
+	public static final List<String> vertexAiScopes = List.of("https://www.googleapis.com/auth/cloud-platform");
 	private static List<Content> historyContent = new ArrayList<>();
 	private static List<Conversation> conversations = new ArrayList<>();
 	private static final String VERTEX_URL = "https://{0}-aiplatform.googleapis.com/v1/projects/{1}/locations/{0}/publishers/google/models/{2}:generateContent";
 	private static final String GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key={0}";
 
-	public static String getAccessToken() throws IOException {
+	public String getAccessToken() throws IOException {
 		GoogleCredentials credentials = ServiceAccountCredentials.fromStream(new FileInputStream(VERTEX_KEY_FILE_PATH))
 				.createScoped(vertexAiScopes);
 		AccessToken token = credentials.refreshAccessToken();
+		Ivy.log().warn("real path " + Ivy.var().get("vertexai-gemini.keyFilePath"));
+		Ivy.log().warn("real " + VERTEX_KEY_FILE_PATH);
 		return token.getTokenValue();
 	}
 
-	private static Content formatRequest(String message) {
+	public Content formatRequest(String message) {
 		String content = extractHtmlString(message);
 		List<String> imgTags = extractImgTagsFromArticleContent(content).stream().toList();
 		if (ObjectUtils.isNotEmpty(imgTags)) {
@@ -74,7 +75,7 @@ public class GeminiDataRequestService {
 		return new Content(Role.USER.getName(), List.of(currentPart));
 	}
 
-	private static RequestRoot createRequestBody(String message) {
+	public RequestRoot createRequestBody(String message) {
 		Content requestContent = formatRequest(message);
 		conversations.add(new Conversation(Role.USER.getName(), message));
 		historyContent.add(requestContent);
@@ -87,7 +88,6 @@ public class GeminiDataRequestService {
 		// Create HTTP client
 		HttpClient client = HttpClient.newHttpClient();
 		// Build request
-		
 		HttpRequest request = generateHttpRequestBasedOnModel(platFormModel, new Gson().toJson(bodyRequestContent));
 
 		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -130,7 +130,7 @@ public class GeminiDataRequestService {
 		conversations = new ArrayList<>();
 	}
 
-	private static Set<String> extractImgTagsFromArticleContent(String content) {
+	public Set<String> extractImgTagsFromArticleContent(String content) {
 		Set<String> imgTags = new HashSet<>();
 		Pattern pattern = Pattern.compile(IMG_TAG_PATTERN);
 		Matcher matcher = pattern.matcher(content);
@@ -141,7 +141,7 @@ public class GeminiDataRequestService {
 		return imgTags;
 	}
 
-	private static String extractImgAttribute(String imgTag) {
+	public static String extractImgAttribute(String imgTag) {
 		Pattern pattern = Pattern.compile(IMG_SRC_ATTR_PATTERN);
 		Matcher matcher = pattern.matcher(imgTag);
 		String imgAttribute = Strings.EMPTY;
@@ -151,7 +151,7 @@ public class GeminiDataRequestService {
 		return imgAttribute;
 	}
 
-	private static String extractHtmlString(String htmlContent) {
+	public String extractHtmlString(String htmlContent) {
 		Document doc = Jsoup.parse(htmlContent);
 		Elements content = doc.select("p");
 		return content.stream().map(Element::html).collect(Collectors.joining(" "));

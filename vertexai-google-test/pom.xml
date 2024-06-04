@@ -19,6 +19,12 @@
       <version>${project.version}</version>
       <type>iar</type>
     </dependency>
+    <dependency>
+	  <groupId>org.mockito</groupId>
+	  <artifactId>mockito-inline</artifactId>
+	  <version>3.6.0</version>
+	  <scope>test</scope>
+    </dependency>   
   </dependencies>
   <build>
     <testSourceDirectory>src_test</testSourceDirectory>
