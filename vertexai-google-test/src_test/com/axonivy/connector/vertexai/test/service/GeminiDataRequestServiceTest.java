@@ -3,10 +3,8 @@ package com.axonivy.connector.vertexai.test.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.FileInputStream;
@@ -149,25 +147,9 @@ public class GeminiDataRequestServiceTest {
 	public void testSendRequestToGemini_SuccessResponse() throws IOException, InterruptedException {
 		// Given
 		mockAccessToken();
+		mockHttpClient(200);
 		String message = "Hello, Gemini!";
 		Model platformModel = Model.VERTEXAI_GEMINI;
-		String mockResponseBody = DataMock.load("json/responseContent.json");
-
-		// Mocking HttpClient
-		HttpClient httpClient = mock(HttpClient.class);
-		httpClientMockedStatic.when(HttpClient::newHttpClient).thenReturn(httpClient);
-
-		// Mocking HttpRequest
-		// HttpRequest httpRequest = mock(HttpRequest.class);
-		// when(httpRequest.uri()).thenReturn(URI.create("hello gau"));
-
-		// Mocking HttpResponse
-		HttpResponse<String> httpResponse = mock(HttpResponse.class);
-		when(httpResponse.statusCode()).thenReturn(200);
-		when(httpResponse.body()).thenReturn(mockResponseBody);
-
-		httpClientMockedStatic.when(() -> httpClient.send(ArgumentMatchers.any(), ArgumentMatchers.any()))
-				.thenReturn(httpResponse);
 
 		List<Conversation> result = geminiDataRequestService.sendRequestToGemini(message, platformModel);
 
@@ -181,26 +163,9 @@ public class GeminiDataRequestServiceTest {
 	public void testSendRequestToGemini_ServerOverLoad() throws IOException, InterruptedException {
 		// Given
 		mockAccessToken();
+		mockHttpClient(429);
 		String message = "Hello, Gemini!";
 		Model platformModel = Model.VERTEXAI_GEMINI;
-		String mockResponseBody = DataMock.load("json/responseContent.json");
-
-		// Mocking HttpClient
-		HttpClient httpClient = mock(HttpClient.class);
-		httpClientMockedStatic.when(HttpClient::newHttpClient).thenReturn(httpClient);
-
-		// Mocking HttpRequest
-		// HttpRequest httpRequest = mock(HttpRequest.class);
-		// when(httpRequest.uri()).thenReturn(URI.create("hello gau"));
-
-		// Mocking HttpResponse
-		HttpResponse<String> httpResponse = mock(HttpResponse.class);
-		when(httpResponse.statusCode()).thenReturn(429);
-		when(httpResponse.body()).thenReturn(mockResponseBody);
-
-		httpClientMockedStatic.when(() -> httpClient.send(ArgumentMatchers.any(), ArgumentMatchers.any()))
-				.thenReturn(httpResponse);
-
 		List<Conversation> result = geminiDataRequestService.sendRequestToGemini(message, platformModel);
 
 		// Then
@@ -236,5 +201,25 @@ public class GeminiDataRequestServiceTest {
 
 		// When refreshAccessToken is called, return the mocked AccessToken
 		when(mockGoogleCredentials.refreshAccessToken()).thenReturn(mockAccessToken);
+	}
+
+	private void mockHttpClient(int statusCode) {
+		String mockResponseBody = DataMock.load("json/responseContent.json");
+
+		// Mocking HttpClient
+		HttpClient httpClient = mock(HttpClient.class);
+		httpClientMockedStatic.when(HttpClient::newHttpClient).thenReturn(httpClient);
+
+		// Mocking HttpRequest
+		// HttpRequest httpRequest = mock(HttpRequest.class);
+		// when(httpRequest.uri()).thenReturn(URI.create("hello"));
+
+		// Mocking HttpResponse
+		HttpResponse<String> httpResponse = mock(HttpResponse.class);
+		when(httpResponse.statusCode()).thenReturn(statusCode);
+		when(httpResponse.body()).thenReturn(mockResponseBody);
+
+		httpClientMockedStatic.when(() -> httpClient.send(ArgumentMatchers.any(), ArgumentMatchers.any()))
+				.thenReturn(httpResponse);
 	}
 }

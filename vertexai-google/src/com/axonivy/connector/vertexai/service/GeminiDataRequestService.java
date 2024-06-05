@@ -17,6 +17,8 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.gson.Gson;
 import ch.ivyteam.ivy.environment.Ivy;
+
+import com.axonivy.connector.vertexai.Constants;
 import com.axonivy.connector.vertexai.entities.*;
 import com.axonivy.connector.vertexai.utils.GeminiDataRequestServiceUtils;
 
@@ -77,19 +79,15 @@ public class GeminiDataRequestService {
 		} else if (response.statusCode() == 429) {
 			Ivy.log().error("Request failed: " + response.statusCode());
 			Ivy.log().error(response.body());
-			Part currentPart = new Part("The server is now overloaded. Please try again later");
+			Part currentPart = new Part(Constants.OVERLOADED_SERVER_MESSAGE);
 			Content contentResponse = new Content(Role.MODEL.getName(), List.of(currentPart));
 			historyContent.add(contentResponse);
-			conversations.add(
-					new Conversation(Role.MODEL.getName(), "The server is now overloaded. Please try again later"));
+			conversations.add(new Conversation(Role.MODEL.getName(), Constants.OVERLOADED_SERVER_MESSAGE));
 		} else {
 			Ivy.log().error("Request failed: " + response.statusCode());
 			Ivy.log().error(response.body());
-			Part currentPart = new Part("There are some issue in server. Please try again later");
-			Content contentResponse = new Content(Role.MODEL.getName(), List.of(currentPart));
-			historyContent.add(contentResponse);
-			conversations.add(
-					new Conversation(Role.MODEL.getName(), "There are some issue in server. Please try again later"));
+			historyContent.remove(historyContent.size() - 1);
+			conversations.add(new Conversation(Role.MODEL.getName(), Constants.SERVER_ERROR));
 		}
 		return conversations;
 	}

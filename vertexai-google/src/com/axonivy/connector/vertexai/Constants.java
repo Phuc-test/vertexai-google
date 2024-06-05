@@ -2,52 +2,6 @@ package com.axonivy.connector.vertexai;
 
 public class Constants {
 	public static final String COMMA = ",";
-	public static final String onlyTextInput = """
-			       {
-			         "role": "%s",
-			         "parts": [
-			           {
-			             "text": "%s"
-			           }
-			         ]
-			       }
-			""";
-
-	public static final String onlyTextOutput = """
-			       {
-			         "role": "%s",
-			         "parts": [
-			           {
-			             "text": %s
-			           }
-			         ]
-			       }
-			""";
-
-	public static final String textAndImageInput = """
-			       {
-			         "role": "%s",
-			         "parts": [
-			           {
-			             "text": "%s"
-			           },
-			           %s
-			         ]
-			       }
-			""";
-
-	public static final String jsonContent = """
-			    {
-			        "contents": [%s]
-			    }
-			""";
-
-	public static final String imageInput = """
-			    {
-			      "inline_data": {
-			        "mime_type": "image/jpeg",
-			        "data": "%s"
-			      }
-			    }
-			""";
+	public static final String OVERLOADED_SERVER_MESSAGE = "The server is now overloaded. Please try again later";
+	public static final String SERVER_ERROR = "There are some issue in server. Please try again later";
 }
