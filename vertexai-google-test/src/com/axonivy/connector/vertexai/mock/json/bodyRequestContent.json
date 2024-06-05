@@ -1,0 +1,18 @@
+{
+  "contents": [
+    {
+      "role": "user",
+      "parts": [
+        {
+          "text": "What is in the image ?"
+        },
+        {
+          "inline_data": {
+            "mime_type": "image/jpeg",
+            "data": "iVBORw0KGgoAAAANSUhEUgAAAEsAAAAhCAIAAAAeQ8GBg;"
+          }
+        }
+      ]
+    }
+  ]
+}

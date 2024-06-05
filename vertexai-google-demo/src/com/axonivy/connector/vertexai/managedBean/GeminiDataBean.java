@@ -1,4 +1,4 @@
-package com.axonivy.managedBean;
+package com.axonivy.connector.vertexai.managedBean;
 
 import java.util.ArrayList;
 import java.util.List;

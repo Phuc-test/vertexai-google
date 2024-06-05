@@ -1,4 +1,4 @@
-package com.axon.market.test;
+package com.axonivy.connector.vertexai.test.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
