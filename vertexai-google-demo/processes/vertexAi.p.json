@@ -7,10 +7,10 @@
   "elements" : [ {
       "id" : "f0",
       "type" : "RequestStart",
-      "name" : "UsingTextEditor.ivp",
+      "name" : "ChatWithAI.ivp",
       "config" : {
-        "callSignature" : "UsingTextEditor",
-        "outLink" : "UsingTextEditor.ivp",
+        "callSignature" : "ChatWithAI",
+        "outLink" : "ChatWithAI.ivp",
         "case" : { }
       },
       "visual" : {

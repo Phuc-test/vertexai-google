@@ -215,6 +215,7 @@ public class GeminiDataRequestServiceTest {
 		// when(httpRequest.uri()).thenReturn(URI.create("hello"));
 
 		// Mocking HttpResponse
+		@SuppressWarnings("unchecked")
 		HttpResponse<String> httpResponse = mock(HttpResponse.class);
 		when(httpResponse.statusCode()).thenReturn(statusCode);
 		when(httpResponse.body()).thenReturn(mockResponseBody);
