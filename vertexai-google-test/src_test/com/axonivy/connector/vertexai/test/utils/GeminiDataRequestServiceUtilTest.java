@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 import com.axonivy.connector.vertexai.entities.Content;
 import com.axonivy.connector.vertexai.utils.GeminiDataRequestServiceUtils;
 import com.google.gson.Gson;
-import ch.ivyteam.ivy.bpm.exec.client.IvyProcessTest;
 import ch.ivyteam.ivy.environment.AppFixture;
+import ch.ivyteam.ivy.environment.IvyTest;
 
-@IvyProcessTest
+@IvyTest
 public class GeminiDataRequestServiceUtilTest {
 	public static final String IMG_TAG_PATTERN = "<img\\s+[^>]*>";
 	public static final String IMG_SRC_ATTR_PATTERN = "data:image\\/[^;]+;base64,([^\"]+)";

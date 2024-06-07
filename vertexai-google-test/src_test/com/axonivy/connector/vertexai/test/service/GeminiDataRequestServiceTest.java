@@ -34,10 +34,10 @@ import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.gson.Gson;
-import ch.ivyteam.ivy.bpm.exec.client.IvyProcessTest;
 import ch.ivyteam.ivy.environment.AppFixture;
+import ch.ivyteam.ivy.environment.IvyTest;
 
-@IvyProcessTest
+@IvyTest
 public class GeminiDataRequestServiceTest {
 	private GeminiDataRequestService geminiDataRequestService;
 	MockedStatic<GeminiDataRequestServiceUtils> geminiDataRequestServiceMock;
