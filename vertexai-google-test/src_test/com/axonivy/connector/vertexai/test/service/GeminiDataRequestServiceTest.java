@@ -209,10 +209,6 @@ public class GeminiDataRequestServiceTest {
 		HttpClient httpClient = mock(HttpClient.class);
 		httpClientMockedStatic.when(HttpClient::newHttpClient).thenReturn(httpClient);
 
-		// Mocking HttpRequest
-		// HttpRequest httpRequest = mock(HttpRequest.class);
-		// when(httpRequest.uri()).thenReturn(URI.create("hello"));
-
 		// Mocking HttpResponse
 		@SuppressWarnings("unchecked")
 		HttpResponse<String> httpResponse = mock(HttpResponse.class);
