@@ -28,7 +28,7 @@
       "type" : "DialogCall",
       "name" : "chatWithAi",
       "config" : {
-        "dialogId" : "com.axonivy.connector.vertexai.vertexai.google.demo.chatWithAi",
+        "dialogId" : "com.axonivy.connector.vertexai.chatWithAi",
         "startMethod" : "start()"
       },
       "visual" : {

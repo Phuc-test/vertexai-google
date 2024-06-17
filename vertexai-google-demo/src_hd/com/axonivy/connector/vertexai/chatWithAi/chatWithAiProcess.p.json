@@ -3,7 +3,7 @@
   "id" : "18FBD13F8FD6EB9F",
   "kind" : "HTML_DIALOG",
   "config" : {
-    "data" : "com.axonivy.connector.vertexai.vertexai.google.demo.chatWithAi.chatWithAiData"
+    "data" : "com.axonivy.connector.vertexai.chatWithAi.chatWithAiData"
   },
   "elements" : [ {
       "id" : "f0",
