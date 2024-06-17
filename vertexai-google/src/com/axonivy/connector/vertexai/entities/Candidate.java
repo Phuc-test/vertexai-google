@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class Candidate {
 	@SerializedName("content")
-	Content content;
+	private Content content;
 
 	public Content getContent() {
 		return content;

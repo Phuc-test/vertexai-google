@@ -1,4 +1,4 @@
-package com.axonivy.connector.vertexai.entities;
+package com.axonivy.connector.vertexai.enums;
 
 public enum Model {
 	VERTEXAI_GEMINI("VertexAi-Gemini"), GEMINI("Gemini");

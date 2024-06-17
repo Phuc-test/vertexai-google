@@ -5,7 +5,7 @@ import java.util.List;
 
 public class ResponseRoot {
 	@SerializedName("candidates")
-	List<Candidate> candidates;
+	private List<Candidate> candidates;
 
 	public List<Candidate> getCandidates() {
 		return candidates;

@@ -18,8 +18,10 @@ import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.gson.Gson;
 import ch.ivyteam.ivy.environment.Ivy;
 
-import com.axonivy.connector.vertexai.Constants;
+import com.axonivy.connector.vertexai.constants.*;
 import com.axonivy.connector.vertexai.entities.*;
+import com.axonivy.connector.vertexai.enums.Model;
+import com.axonivy.connector.vertexai.enums.Role;
 import com.axonivy.connector.vertexai.utils.GeminiDataRequestServiceUtils;
 
 public class GeminiDataRequestService {
@@ -33,7 +35,7 @@ public class GeminiDataRequestService {
 	public static String VERTEX_KEY_FILE_PATH = Ivy.var().get("vertexai-gemini.keyFilePath");
 	public static String GEMINI_KEY = Ivy.var().get("gemini.apiKey");
 
-	private static List<Content> historyContent = new ArrayList<>();
+	private static List<Content> historyContents = new ArrayList<>();
 	private static List<Conversation> conversations = new ArrayList<>();
 
 	private static GeminiDataRequestServiceUtils dataRequestServiceUtils = new GeminiDataRequestServiceUtils();
@@ -49,8 +51,8 @@ public class GeminiDataRequestService {
 	public RequestRoot createRequestBody(String message) {
 		Content requestContent = dataRequestServiceUtils.formatRequest(message);
 		conversations.add(new Conversation(Role.USER.getName(), message));
-		historyContent.add(requestContent);
-		return new RequestRoot(historyContent);
+		historyContents.add(requestContent);
+		return new RequestRoot(historyContents);
 	}
 
 	public List<Conversation> sendRequestToGemini(String message, Model platFormModel)
@@ -75,25 +77,25 @@ public class GeminiDataRequestService {
 						Part currentPart = new Part(text.trim());
 						return new Content(Role.MODEL.getName(), List.of(currentPart));
 					}).orElse(null);
-			historyContent.add(contentResponse);
+			historyContents.add(contentResponse);
 		} else if (response.statusCode() == 429) {
 			Ivy.log().error("Request failed: " + response.statusCode());
 			Ivy.log().error(response.body());
 			Part currentPart = new Part(Constants.OVERLOADED_SERVER_MESSAGE);
 			Content contentResponse = new Content(Role.MODEL.getName(), List.of(currentPart));
-			historyContent.add(contentResponse);
+			historyContents.add(contentResponse);
 			conversations.add(new Conversation(Role.MODEL.getName(), Constants.OVERLOADED_SERVER_MESSAGE));
 		} else {
 			Ivy.log().error("Request failed: " + response.statusCode());
 			Ivy.log().error(response.body());
-			historyContent.remove(historyContent.size() - 1);
+			historyContents.remove(historyContents.size() - 1);
 			conversations.add(new Conversation(Role.MODEL.getName(), Constants.SERVER_ERROR));
 		}
 		return conversations;
 	}
 
 	public void cleanData() {
-		historyContent = new ArrayList<>();
+		historyContents = new ArrayList<>();
 		conversations = new ArrayList<>();
 	}
 
@@ -101,14 +103,14 @@ public class GeminiDataRequestService {
 			throws IOException {
 		if (platformModel == Model.VERTEXAI_GEMINI) {
 			String accessToken = getAccessToken();
-			String VERTEXAI_GEMINI_ENDPOINT = MessageFormat.format(VERTEX_URL, VERTEX_LOCATION, VERTEX_PROJECT_ID,
+			String vertexAiGeminiEndpoint = MessageFormat.format(VERTEX_URL, VERTEX_LOCATION, VERTEX_PROJECT_ID,
 					VERTEX_MODEL_NAME);
-			return HttpRequest.newBuilder().uri(URI.create(VERTEXAI_GEMINI_ENDPOINT))
+			return HttpRequest.newBuilder().uri(URI.create(vertexAiGeminiEndpoint))
 					.header("Authorization", "Bearer " + accessToken).header("Content-Type", "application/json")
 					.POST(HttpRequest.BodyPublishers.ofString(bodyRequestContent)).build();
 		}
-		String GEMINI_ENDPOINT = MessageFormat.format(GEMINI_URL, GEMINI_KEY);
-		return HttpRequest.newBuilder().uri(URI.create(GEMINI_ENDPOINT)).header("Content-Type", "application/json")
+		String geminiEndpoint = MessageFormat.format(GEMINI_URL, GEMINI_KEY);
+		return HttpRequest.newBuilder().uri(URI.create(geminiEndpoint)).header("Content-Type", "application/json")
 				.POST(HttpRequest.BodyPublishers.ofString(bodyRequestContent)).build();
 	}
 }

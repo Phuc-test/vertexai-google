@@ -24,9 +24,8 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import com.axonivy.connector.vertexai.entities.Conversation;
-import com.axonivy.connector.vertexai.entities.Model;
+import com.axonivy.connector.vertexai.enums.*;
 import com.axonivy.connector.vertexai.entities.RequestRoot;
-import com.axonivy.connector.vertexai.entities.Role;
 import com.axonivy.connector.vertexai.mock.DataMock;
 import com.axonivy.connector.vertexai.service.GeminiDataRequestService;
 import com.axonivy.connector.vertexai.utils.GeminiDataRequestServiceUtils;

@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class RequestRoot {
 	@SerializedName("contents")
-	List<Content> contents;
+	private List<Content> contents;
 
 	public RequestRoot(List<Content> contents) {
 		this.contents = contents;

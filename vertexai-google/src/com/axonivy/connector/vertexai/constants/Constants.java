@@ -1,4 +1,4 @@
-package com.axonivy.connector.vertexai;
+package com.axonivy.connector.vertexai.constants;
 
 public class Constants {
 	public static final String COMMA = ",";

@@ -7,6 +7,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import org.apache.commons.lang3.StringUtils;
 import com.axonivy.connector.vertexai.entities.*;
+import com.axonivy.connector.vertexai.enums.Model;
 import com.axonivy.connector.vertexai.service.GeminiDataRequestService;
 
 @ManagedBean
@@ -30,7 +31,6 @@ public class GeminiDataBean {
 
 	public void onCleanText() {
 		init();
-		geminiDataRequestService.cleanData();
 	}
 
 	public Model[] onSelectModel() {

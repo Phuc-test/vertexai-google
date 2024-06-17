@@ -21,7 +21,7 @@ import org.jsoup.select.Elements;
 import com.axonivy.connector.vertexai.entities.Content;
 import com.axonivy.connector.vertexai.entities.InlineData;
 import com.axonivy.connector.vertexai.entities.Part;
-import com.axonivy.connector.vertexai.entities.Role;
+import com.axonivy.connector.vertexai.enums.Role;
 
 public class GeminiDataRequestServiceUtils {
 	public static final String IMG_TAG_PATTERN = "<img\\s+[^>]*>";
