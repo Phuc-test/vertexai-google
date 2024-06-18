@@ -73,7 +73,8 @@ public class GeminiDataRequestService {
 					.map(Collection::stream).flatMap(Stream::findFirst).map(Candidate::getContent)
 					.map(Content::getParts).map(Collection::stream).flatMap(Stream::findFirst).map(Part::getText)
 					.map(text -> {
-						conversations.add(new Conversation(Role.MODEL.getName(), text.trim()));
+						conversations.add(new Conversation(Role.MODEL.getName(),
+								GeminiDataRequestServiceUtils.addCodesToPreTagIfPresent(text)));
 						Part currentPart = new Part(text.trim());
 						return new Content(Role.MODEL.getName(), List.of(currentPart));
 					}).orElse(null);

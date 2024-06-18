@@ -7,11 +7,11 @@
 	xmlns:pe="http://primefaces.org/ui/extensions">
 
 <h:body>
-	<ui:composition template="/layouts/basic-10.xhtml">
+	<ui:composition template="/layouts/frame-10-full-width.xhtml">
 		<ui:param name="managedBean" value="#{geminiDataBean}" />
 		<ui:define name="title">ChatWithAi</ui:define>
 		<ui:define name="content">
-			<h3>AI Chat</h3>
+			<h:outputStylesheet name="layouts/styles/chatwithai.css" />
 			<h:form id="form" styleClass="form-container">
 				<p:panelGrid columns="1" layout="grid"
 					styleClass="ui-panelgrid-blank ui-noborder">
@@ -25,19 +25,18 @@
 					</div>
 					<ui:repeat var="conversation" value="#{managedBean.conversations}">
 						<p:panel rendered="#{conversation.role == 'user'}"
-							styleClass="model-panel ui-fluid" style="text-align:right;">
-							<h:outputText value="#{ivy.session.sessionUser.displayName}"
-								style="font-weight:bold;" />
+							styleClass="conservation-panel ui-fluid">
+							<h:outputText value="User" class="user-label" />
+							<br />
 							<h:outputText value="#{conversation.text}" escape="false"
-								style="white-space: pre-line; display:block; margin-bottom:20px;" />
+								class="output-text" />
 						</p:panel>
 
 						<p:panel rendered="#{conversation.role == 'model'}"
-							styleClass="ui-fluid">
-							<h:outputText value="#{conversation.role}"
-								style="font-weight:bold; color: red" />
-							<h:outputText value="#{conversation.text}"
-								style="white-space: pre-line; display:block; margin-bottom:20px;" />
+							styleClass="conservation-panel ui-fluid">
+							<h:outputText value="#{conversation.role}" class="model-label" />
+							<br />
+							<h:outputText value="#{conversation.text}" class="output-text" escape="false"/>
 						</p:panel>
 					</ui:repeat>
 				</p:panelGrid>
@@ -45,13 +44,13 @@
 				<div id="article-content">
 					<p:textEditor widgetVar="editor" id="editor"
 						value="#{managedBean.inputtedMessage}" allowImages="true"
-						toolbarVisible="false" height="100"
-						placeholder="How can I help you today?">
+						toolbarVisible="false" placeholder="How can I help you today?"
+						styleClass="text-editor">
 						<f:validator validatorId="commonValidator" />
 					</p:textEditor>
 					<p:message id="message" for="editor" />
 				</div>
-				<br />
+
 				<div class="command-btns">
 					<p:commandButton id="refresh" value="refresh" update="form"
 						actionListener="#{managedBean.onCleanText()}" icon="pi pi-refresh" />

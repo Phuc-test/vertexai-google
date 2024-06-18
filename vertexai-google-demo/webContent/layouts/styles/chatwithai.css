@@ -1,0 +1,35 @@
+#article-content {
+	width: 100%; /* Set the desired width */
+	overflow-x: auto; /* Enable horizontal scrolling if needed */
+	overflow-y: auto; /* Enable vertical scrolling if needed */
+	max-height: 300px; /* Set the maximum height for the div */
+}
+
+.text-editor {
+	width: 100%;
+}
+
+.user-label {
+	font-weight: bold;
+	background-color: #39563e;
+	color: white;
+	font-family: 'Helvetica Neue', sans-serif;
+	padding: 10px 20px;
+	border-radius: 20px;
+}
+
+.model-label {
+	font-weight: bold;
+	background-color: #202f58;
+	color: white;
+	font-family: 'Helvetica Neue', sans-serif;
+	padding: 10px 20px;
+	border-radius: 20px;
+}
+
+.output-text {
+	background-color: var(--surface-a);
+	white-space: pre-line;
+	display: block;
+	padding: 10px 20px;
+}
