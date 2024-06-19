@@ -33,3 +33,26 @@
 	display: block;
 	padding: 10px 20px;
 }
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Ensure it takes the full height of the viewport */
+}
+
+.ui-panelgrid-blank {
+    flex: 1; /* Make the panel grid take available space */
+    overflow-y: auto; /* Add scroll if content overflows */
+}
+
+.form-bottom {
+    display: flex;
+    flex-direction: column;
+    margin-top: auto; /* Push this section to the bottom */
+}
+
+.command-btns {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px; /* Add some spacing between the editor and buttons */
+}

@@ -11,7 +11,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.jsoup.Jsoup;
@@ -23,8 +22,6 @@ import com.axonivy.connector.vertexai.entities.Content;
 import com.axonivy.connector.vertexai.entities.InlineData;
 import com.axonivy.connector.vertexai.entities.Part;
 import com.axonivy.connector.vertexai.enums.Role;
-
-import ch.ivyteam.ivy.environment.Ivy;
 
 public class GeminiDataRequestServiceUtils {
 	public static final String IMG_TAG_PATTERN = "<img\\s+[^>]*>";
@@ -80,45 +77,4 @@ public class GeminiDataRequestServiceUtils {
 		return content.stream().map(Element::html).collect(Collectors.joining(" "));
 	}
 
-	public static String addCodesToPreTagIfPresent(String content) {
-		Ivy.log().warn("content ne : " + content);
-		Pattern pattern = Pattern.compile("```(.*?)```", Pattern.DOTALL);
-		Matcher matcher = pattern.matcher(content);
-		List<String> matchedStrings = new ArrayList<>();
-		while (matcher.find()) {
-			matchedStrings.add(matcher.group(1).trim());
-		}
-		for (String matchedString : matchedStrings) {
-			String convertedString = matchedString;
-			if (matchedString.startsWith("html") || matchedString.startsWith("xml")
-					|| matchedString.startsWith("xhtml")) {
-				convertedString = StringEscapeUtils.escapeHtml(matchedString);
-			}
-			String codeResponse = String.format("<pre style=\"background-color: black;\"> <code>%s</code> </pre>",
-					convertedString);
-			content = content.replace(matchedString, codeResponse).replaceAll("```", "");
-		}
-		return escapeExceptPre(content);
-	}
-
-	private static String escapeExceptPre(String htmlText) {
-		Pattern preTagPattern = Pattern.compile("(<pre.*?>.*?</pre>)", Pattern.DOTALL);
-		Matcher matcher = preTagPattern.matcher(htmlText);
-		StringBuffer result = new StringBuffer();
-		// Index to keep track of the last match's end
-		int lastEnd = 0;
-		while (matcher.find()) {
-			// Append and escape the text before the current <pre> block
-			String beforePre = htmlText.substring(lastEnd, matcher.start());
-			result.append(StringEscapeUtils.escapeHtml(beforePre));
-			// Append the current <pre> block without escaping
-			result.append(matcher.group(1));
-			// Update the last match's end index
-			lastEnd = matcher.end();
-		}
-		// Append and escape any remaining text after the last <pre> block
-		String afterLastPre = htmlText.substring(lastEnd);
-		result.append(StringEscapeUtils.escapeHtml(afterLastPre));
-		return result.toString();
-	}
 }
