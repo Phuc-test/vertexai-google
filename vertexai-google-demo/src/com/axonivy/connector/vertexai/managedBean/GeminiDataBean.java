@@ -43,6 +43,7 @@ public class GeminiDataBean {
 		Pattern pattern = Pattern.compile(CODE_RESPONSE_PATTERN, Pattern.DOTALL);
 		conversations.forEach(conversation -> {
 			if (conversation.getRole().equals(Role.MODEL.getName())) {
+				String result = conversation.getText();
 				Matcher matcher = pattern.matcher(conversation.getText());
 				List<String> matchedStrings = new ArrayList<>();
 				while (matcher.find()) {
@@ -57,9 +58,10 @@ public class GeminiDataBean {
 					String codeResponse = String
 							.format("<pre style=\"background-color: black;\"> <code>%s</code> </pre>", convertedString);
 
-					String result = conversation.getText().replace(matchedString, codeResponse).replaceAll("```", "");
-					conversation.setText(escapeExceptPre(result));
+					result = conversation.getText().replace(matchedString, codeResponse).replaceAll("```", "");
+
 				}
+				conversation.setText(escapeExceptPre(result));
 			}
 		});
 	}
