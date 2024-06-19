@@ -2,7 +2,7 @@
   "format" : "10.0.0",
   "id" : "18FBD17FA8E55D35",
   "config" : {
-    "data" : "com.axon.market.vertexai.google.demo.Data"
+    "data" : "com.axonivy.connector.vertexai.Data"
   },
   "elements" : [ {
       "id" : "f0",
