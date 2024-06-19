@@ -34,7 +34,9 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.gson.Gson;
 import ch.ivyteam.ivy.environment.AppFixture;
+import ch.ivyteam.ivy.environment.Ivy;
 import ch.ivyteam.ivy.environment.IvyTest;
+import ch.ivyteam.log.Logger;
 
 @IvyTest
 public class GeminiDataRequestServiceTest {
@@ -165,11 +167,15 @@ public class GeminiDataRequestServiceTest {
 		mockHttpClient(429);
 		String message = "Hello, Gemini!";
 		Model platformModel = Model.VERTEXAI_GEMINI;
+		MockedStatic<Ivy> ivyMock = mockStatic(Ivy.class);
+		Logger logger = mock(Logger.class);
+		ivyMock.when(() -> Ivy.log()).thenReturn(logger);
+		
 		List<Conversation> result = geminiDataRequestService.sendRequestToGemini(message, platformModel);
 
 		// Then
 		assertEquals(2, result.size());
-		assertEquals("The server is now overloaded. Please try again later", result.get(1).getText());
+		assertEquals("There are some issue in server. Please try again later", result.get(1).getText());
 		assertEquals(Role.MODEL.getName(), result.get(1).getRole());
 	}
 

@@ -78,13 +78,6 @@ public class GeminiDataRequestService {
 						return new Content(Role.MODEL.getName(), List.of(currentPart));
 					}).orElse(null);
 			historyContents.add(contentResponse);
-		} else if (response.statusCode() == 429) {
-			Ivy.log().error("Request failed: " + response.statusCode());
-			Ivy.log().error(response.body());
-			Part currentPart = new Part(Constants.OVERLOADED_SERVER_MESSAGE);
-			Content contentResponse = new Content(Role.MODEL.getName(), List.of(currentPart));
-			historyContents.add(contentResponse);
-			conversations.add(new Conversation(Role.MODEL.getName(), Constants.OVERLOADED_SERVER_MESSAGE));
 		} else {
 			Ivy.log().error("Request failed: " + response.statusCode());
 			Ivy.log().error(response.body());
