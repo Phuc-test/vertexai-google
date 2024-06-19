@@ -7,10 +7,10 @@
   "elements" : [ {
       "id" : "f0",
       "type" : "RequestStart",
-      "name" : "ChatWithAI.ivp",
+      "name" : "chatWithAi.ivp",
       "config" : {
-        "callSignature" : "ChatWithAI",
-        "outLink" : "ChatWithAI.ivp",
+        "callSignature" : "chatWithAi",
+        "outLink" : "chatWithAi.ivp",
         "case" : { }
       },
       "visual" : {

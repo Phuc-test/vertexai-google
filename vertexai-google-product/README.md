@@ -33,7 +33,7 @@
 ![](images/go-to-setup-IAM-Admin.jpg)
 #### You can create an account and grant permission/role for this account
 #### You have to select the account that you just created and select "Key" and choose "ADD key"
-![](images/getKey.jpg)
+![](images/get-Key.jpg)
 #### "ADD Key" -> "Create new Key" -> "Json" -> Google Cloud automatically download for you a credential json file.
 #### You keep this file and put the path of the file to `Variables.vertexai-gemini.keyFilePath`
 #### You can select the modelName from here: [Vertex AI Gemini Model name](https://console.cloud.google.com/vertex-ai/publishers/google/model-garden/gemini-1.5-pro-001)
