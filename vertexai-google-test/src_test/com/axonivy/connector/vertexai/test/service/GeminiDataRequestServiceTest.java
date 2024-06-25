@@ -23,6 +23,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
+import com.axonivy.connector.vertexai.constants.Constants;
 import com.axonivy.connector.vertexai.entities.Conversation;
 import com.axonivy.connector.vertexai.enums.*;
 import com.axonivy.connector.vertexai.entities.RequestRoot;
@@ -67,7 +68,7 @@ public class GeminiDataRequestServiceTest {
 	}
 
 	@Test
-	public void createRequestBody_test() {
+	public void testCreateRequestBody() {
 		String input = "<p>What is in the image ? </p><p><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEsAAAAhCAIAAAAeQ8GBg;\" /></p>";
 		String expectedResult = DataMock.load("json/bodyRequestContent.json");
 		RequestRoot result = geminiDataRequestService.createRequestBody(input);
@@ -96,7 +97,6 @@ public class GeminiDataRequestServiceTest {
 
 	@Test
 	public void testGenerateHttpRequestBasedOnModel_VertexAI_Gemini() throws IOException {
-		// Given
 		mockAccessToken();
 
 		Model platformModel = Model.VERTEXAI_GEMINI;
@@ -109,11 +109,9 @@ public class GeminiDataRequestServiceTest {
 				.header("Authorization", "Bearer ".concat("mockToken")).header("Content-Type", "application/json")
 				.POST(HttpRequest.BodyPublishers.ofString(bodyRequestContent)).build();
 
-		// When
 		HttpRequest actualRequest = geminiDataRequestService.generateHttpRequestBasedOnModel(platformModel,
 				bodyRequestContent);
 
-		// Then
 		assertEquals(expectedRequest.uri(), actualRequest.uri());
 		assertEquals(expectedRequest.headers().map(), actualRequest.headers().map());
 		assertEquals(expectedRequest.bodyPublisher().get().contentLength(),
@@ -123,7 +121,6 @@ public class GeminiDataRequestServiceTest {
 
 	@Test
 	public void testGenerateHttpRequestBasedOnModel_GeminiModel() throws IOException {
-		// Given
 		Model platformModel = Model.GEMINI;
 		String bodyRequestContent = DataMock.load("json/bodyRequestContent.json");
 
@@ -133,11 +130,9 @@ public class GeminiDataRequestServiceTest {
 				.header("Content-Type", "application/json")
 				.POST(HttpRequest.BodyPublishers.ofString(bodyRequestContent)).build();
 
-		// When
 		HttpRequest actualRequest = geminiDataRequestService.generateHttpRequestBasedOnModel(platformModel,
 				bodyRequestContent);
 
-		// Then
 		assertEquals(expectedRequest.uri(), actualRequest.uri());
 		assertEquals(expectedRequest.headers().map(), actualRequest.headers().map());
 		assertEquals(expectedRequest.bodyPublisher().get().contentLength(),
@@ -146,7 +141,6 @@ public class GeminiDataRequestServiceTest {
 
 	@Test
 	public void testSendRequestToGemini_SuccessResponse() throws IOException, InterruptedException {
-		// Given
 		mockAccessToken();
 		mockHttpClient(200);
 		String message = "Hello, Gemini!";
@@ -154,7 +148,6 @@ public class GeminiDataRequestServiceTest {
 
 		List<Conversation> result = geminiDataRequestService.sendRequestToGemini(message, platformModel);
 
-		// Then
 		assertEquals(2, result.size());
 		assertEquals("Hello! What can I do for you today?", result.get(1).getText());
 		assertEquals(Role.MODEL.getName(), result.get(1).getRole());
@@ -162,7 +155,6 @@ public class GeminiDataRequestServiceTest {
 
 	@Test
 	public void testSendRequestToGemini_ServerOverLoad() throws IOException, InterruptedException {
-		// Given
 		mockAccessToken();
 		mockHttpClient(429);
 		String message = "Hello, Gemini!";
@@ -170,17 +162,15 @@ public class GeminiDataRequestServiceTest {
 		MockedStatic<Ivy> ivyMock = mockStatic(Ivy.class);
 		Logger logger = mock(Logger.class);
 		ivyMock.when(() -> Ivy.log()).thenReturn(logger);
-		
+
 		List<Conversation> result = geminiDataRequestService.sendRequestToGemini(message, platformModel);
 
-		// Then
 		assertEquals(2, result.size());
-		assertEquals("There are some issue in server. Please try again later", result.get(1).getText());
+		assertEquals(Constants.SERVER_ERROR, result.get(1).getText());
 		assertEquals(Role.MODEL.getName(), result.get(1).getRole());
 	}
 
 	private void mockAccessToken() throws IOException {
-		// Given
 		String MOCK_TOKEN = "mockToken";
 
 		// Mock the AccessToken

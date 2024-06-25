@@ -37,7 +37,7 @@
 
 						<p:panel rendered="#{conversation.role == 'model'}"
 							styleClass="conservation-panel ui-fluid">
-							<h:outputText value="#{conversation.role}" class="model-label" />
+							<h:outputText value="Model" class="model-label" />
 							<br />
 							<h:outputText value="#{conversation.text}" class="output-text"
 								escape="false" />
@@ -50,8 +50,7 @@
 					<div id="article-content">
 						<p:textEditor widgetVar="editor" id="editor"
 							value="#{managedBean.inputtedMessage}" allowImages="true"
-							toolbarVisible="false" placeholder="How can I help you today?"
-							class="text-editor">
+							toolbarVisible="false" class="text-editor">
 							<f:validator validatorId="commonValidator" />
 						</p:textEditor>
 						<p:message id="message" for="editor" />

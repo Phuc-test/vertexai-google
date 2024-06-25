@@ -18,6 +18,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.axonivy.connector.vertexai.constants.Constants;
 import com.axonivy.connector.vertexai.entities.Content;
 import com.axonivy.connector.vertexai.entities.InlineData;
 import com.axonivy.connector.vertexai.entities.Part;
@@ -74,7 +75,8 @@ public class GeminiDataRequestServiceUtils {
 	public String extractHtmlString(String htmlContent) {
 		Document doc = Jsoup.parse(htmlContent);
 		Elements content = doc.select("p");
-		return content.stream().map(Element::html).collect(Collectors.joining(" "));
+		return content.stream().map(Element::html).filter(html -> !Constants.BR_TAG.equals(html))
+				.collect(Collectors.joining(" "));
 	}
 
 }

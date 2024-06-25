@@ -17,8 +17,11 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.gson.Gson;
 import ch.ivyteam.ivy.environment.Ivy;
-
-import com.axonivy.connector.vertexai.constants.*;
+import static com.axonivy.connector.vertexai.constants.Constants.APPLICATION_JSON_TYPE;
+import static com.axonivy.connector.vertexai.constants.Constants.CONTENT_TYPE_HEADER;
+import static com.axonivy.connector.vertexai.constants.Constants.SERVER_ERROR;
+import static com.axonivy.connector.vertexai.constants.Constants.AUTHORIZATION_HEADER;
+import static com.axonivy.connector.vertexai.constants.Constants.BEARER;
 import com.axonivy.connector.vertexai.entities.*;
 import com.axonivy.connector.vertexai.enums.Model;
 import com.axonivy.connector.vertexai.enums.Role;
@@ -82,7 +85,7 @@ public class GeminiDataRequestService {
 			Ivy.log().error("Request failed: " + response.statusCode());
 			Ivy.log().error(response.body());
 			historyContents.remove(historyContents.size() - 1);
-			conversations.add(new Conversation(Role.MODEL.getName(), Constants.SERVER_ERROR));
+			conversations.add(new Conversation(Role.MODEL.getName(), SERVER_ERROR));
 		}
 		return conversations;
 	}
@@ -94,16 +97,18 @@ public class GeminiDataRequestService {
 
 	public HttpRequest generateHttpRequestBasedOnModel(Model platformModel, String bodyRequestContent)
 			throws IOException {
-		if (platformModel == Model.VERTEXAI_GEMINI) {
+		if (Model.VERTEXAI_GEMINI == platformModel) {
 			String accessToken = getAccessToken();
 			String vertexAiGeminiEndpoint = MessageFormat.format(VERTEX_URL, VERTEX_LOCATION, VERTEX_PROJECT_ID,
 					VERTEX_MODEL_NAME);
 			return HttpRequest.newBuilder().uri(URI.create(vertexAiGeminiEndpoint))
-					.header("Authorization", "Bearer " + accessToken).header("Content-Type", "application/json")
+					.header(AUTHORIZATION_HEADER, BEARER + accessToken)
+					.header(CONTENT_TYPE_HEADER, APPLICATION_JSON_TYPE)
 					.POST(HttpRequest.BodyPublishers.ofString(bodyRequestContent)).build();
 		}
 		String geminiEndpoint = MessageFormat.format(GEMINI_URL, GEMINI_KEY);
-		return HttpRequest.newBuilder().uri(URI.create(geminiEndpoint)).header("Content-Type", "application/json")
+		return HttpRequest.newBuilder().uri(URI.create(geminiEndpoint))
+				.header(CONTENT_TYPE_HEADER, APPLICATION_JSON_TYPE)
 				.POST(HttpRequest.BodyPublishers.ofString(bodyRequestContent)).build();
 	}
 }

@@ -3,6 +3,7 @@ package com.axonivy.connector.vertexai.entities;
 public class Conversation {
 	private String role;
 	private String text;
+	private Boolean isEntityConverted;
 
 	public Conversation(String role, String text) {
 		this.role = role;
@@ -25,4 +26,11 @@ public class Conversation {
 		this.text = text;
 	}
 
+	public Boolean getIsEntityConverted() {
+		return isEntityConverted;
+	}
+
+	public void setIsEntityConverted(Boolean isEntityConverted) {
+		this.isEntityConverted = isEntityConverted;
+	}
 }

@@ -2,6 +2,7 @@ package com.axonivy.connector.vertexai.managedBean;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,6 +11,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import com.axonivy.connector.vertexai.entities.*;
 import com.axonivy.connector.vertexai.enums.Model;
@@ -26,6 +28,7 @@ public class GeminiDataBean {
 
 	private static final String CODE_RESPONSE_PATTERN = "```(.*?)```";
 	private static final String PRE_TAG_PATTERN = "(<pre.*?>.*?</pre>)";
+	private static final Set<String> PREFIXES = Set.of("html", "xml", "xhtml");
 
 	@PostConstruct
 	public void init() {
@@ -41,29 +44,33 @@ public class GeminiDataBean {
 
 	public void addCodesToPreTagIfPresent(List<Conversation> conversations) {
 		Pattern pattern = Pattern.compile(CODE_RESPONSE_PATTERN, Pattern.DOTALL);
-		conversations.forEach(conversation -> {
-			if (conversation.getRole().equals(Role.MODEL.getName())) {
-				String result = conversation.getText();
-				Matcher matcher = pattern.matcher(conversation.getText());
-				List<String> matchedStrings = new ArrayList<>();
-				while (matcher.find()) {
-					matchedStrings.add(matcher.group(1).trim());
-				}
-				for (String matchedString : matchedStrings) {
-					String convertedString = matchedString;
-					if (matchedString.startsWith("html") || matchedString.startsWith("xml")
-							|| matchedString.startsWith("xhtml")) {
-						convertedString = StringEscapeUtils.escapeHtml(matchedString);
+		conversations.stream().filter(conversation -> BooleanUtils.isNotTrue(conversation.getIsEntityConverted()))
+				.forEach(conversation -> {
+					if (conversation.getRole().equals(Role.MODEL.getName())) {
+						String result = conversation.getText();
+						Matcher matcher = pattern.matcher(conversation.getText());
+						List<String> matchedStrings = new ArrayList<>();
+						while (matcher.find()) {
+							matchedStrings.add(matcher.group(1).trim());
+						}
+						for (String matchedString : matchedStrings) {
+							String convertedString = matchedString;
+							for (String prefix : PREFIXES) {
+								if (matchedString.startsWith(prefix)) {
+									convertedString = StringEscapeUtils.escapeHtml(matchedString);
+									break;
+								}
+							}
+							String codeResponse = String.format(
+									"<pre style=\"background-color: black;\"> <code>%s</code> </pre>", convertedString);
+
+							result = conversation.getText().replace(matchedString, codeResponse).replaceAll("```", "");
+
+						}
+						conversation.setText(escapeExceptPre(result));
+						conversation.setIsEntityConverted(true);
 					}
-					String codeResponse = String
-							.format("<pre style=\"background-color: black;\"> <code>%s</code> </pre>", convertedString);
-
-					result = conversation.getText().replace(matchedString, codeResponse).replaceAll("```", "");
-
-				}
-				conversation.setText(escapeExceptPre(result));
-			}
-		});
+				});
 	}
 
 	private String escapeExceptPre(String htmlText) {
