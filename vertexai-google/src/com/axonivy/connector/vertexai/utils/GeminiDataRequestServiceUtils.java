@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -76,7 +77,7 @@ public class GeminiDataRequestServiceUtils {
 		Document doc = Jsoup.parse(htmlContent);
 		Elements content = doc.select("p");
 		return content.stream().map(Element::html).filter(html -> !Constants.BR_TAG.equals(html))
-				.collect(Collectors.joining(" "));
+				.collect(Collectors.joining(StringUtils.SPACE));
 	}
 
 }

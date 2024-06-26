@@ -58,7 +58,7 @@
 
 					<div class="command-btns">
 						<p:commandButton id="refresh" value="refresh" update="form"
-							actionListener="#{managedBean.onCleanText()}"
+							actionListener="#{managedBean.onCleanText()}" immediate="true"
 							icon="pi pi-refresh" />
 						<p:commandButton id="proceed" value="send" update="form"
 							actionListener="#{managedBean.onSendRequest()}"

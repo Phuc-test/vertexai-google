@@ -28,7 +28,9 @@ public class GeminiDataBean {
 
 	private static final String CODE_RESPONSE_PATTERN = "```(.*?)```";
 	private static final String PRE_TAG_PATTERN = "(<pre.*?>.*?</pre>)";
+	private static final String EMOJI_PATTERN = "[\\uD83C-\\uDBFF\\uDC00-\\uDFFF]";
 	private static final Set<String> PREFIXES = Set.of("html", "xml", "xhtml");
+	private static String PRE_TAG_MAPPING = "<pre style=\"background-color: black;\"> <code>%s</code> </pre>";
 
 	@PostConstruct
 	public void init() {
@@ -61,37 +63,58 @@ public class GeminiDataBean {
 									break;
 								}
 							}
-							String codeResponse = String.format(
-									"<pre style=\"background-color: black;\"> <code>%s</code> </pre>", convertedString);
-
-							result = conversation.getText().replace(matchedString, codeResponse).replaceAll("```", "");
+							String codeResponse = String.format(PRE_TAG_MAPPING, convertedString);
+							result = conversation.getText().replace(matchedString, codeResponse).replaceAll("```", StringUtils.EMPTY);
 
 						}
-						conversation.setText(escapeExceptPre(result));
+						conversation.setText(escapeExceptPreAndEmoji(result));
 						conversation.setIsEntityConverted(true);
 					}
 				});
 	}
 
-	private String escapeExceptPre(String htmlText) {
+	public String escapeExceptPreAndEmoji(String htmlText) {
 		Pattern preTagPattern = Pattern.compile(PRE_TAG_PATTERN, Pattern.DOTALL);
 		Matcher matcher = preTagPattern.matcher(htmlText);
-		StringBuffer result = new StringBuffer();
-		// Index to keep track of the last match's end
+		StringBuilder result = new StringBuilder();
 		int lastEnd = 0;
 		while (matcher.find()) {
 			// Append and escape the text before the current <pre> block
 			String beforePre = htmlText.substring(lastEnd, matcher.start());
-			result.append(StringEscapeUtils.escapeHtml(beforePre));
+			result.append(escapeExceptEmoji(beforePre));
 			// Append the current <pre> block without escaping
 			result.append(matcher.group(1));
-			// Update the last match's end index
 			lastEnd = matcher.end();
 		}
 		// Append and escape any remaining text after the last <pre> block
 		String afterLastPre = htmlText.substring(lastEnd);
-		result.append(StringEscapeUtils.escapeHtml(afterLastPre));
+		result.append(escapeExceptEmoji(afterLastPre));
+
 		return result.toString();
+	}
+
+	private String escapeExceptEmoji(String text) {
+		Pattern emojiPattern = Pattern.compile(EMOJI_PATTERN, Pattern.DOTALL);
+		Matcher emojiMatcher = emojiPattern.matcher(text);
+		StringBuilder escapedText = new StringBuilder();
+		int lastEnd = 0;
+
+		while (emojiMatcher.find()) {
+			// Escape the text before the current emoji
+			String beforeEmoji = text.substring(lastEnd, emojiMatcher.start());
+			String escapeValue = StringEscapeUtils.escapeHtml(beforeEmoji);
+			escapedText.append(escapeValue);
+			// Append the current emoji without escaping
+			escapedText.append(emojiMatcher.group());
+			lastEnd = emojiMatcher.end();
+		}
+
+		// Escape any remaining text after the last emoji
+		String afterLastEmoji = text.substring(lastEnd);
+		String escapeValue = StringEscapeUtils.escapeHtml(afterLastEmoji);
+		escapedText.append(escapeValue);
+
+		return escapedText.toString();
 	}
 
 	public void onCleanText() {
