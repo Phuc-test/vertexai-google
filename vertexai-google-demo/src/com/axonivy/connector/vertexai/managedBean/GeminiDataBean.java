@@ -56,15 +56,10 @@ public class GeminiDataBean {
 							matchedStrings.add(matcher.group(1).trim());
 						}
 						for (String matchedString : matchedStrings) {
-							String convertedString = matchedString;
-							for (String prefix : PREFIXES) {
-								if (matchedString.startsWith(prefix)) {
-									convertedString = StringEscapeUtils.escapeHtml(matchedString);
-									break;
-								}
-							}
+							String convertedString = mapHtmlCodeIfNeeded(matchedString);
 							String codeResponse = String.format(PRE_TAG_MAPPING, convertedString);
-							result = conversation.getText().replace(matchedString, codeResponse).replaceAll("```", StringUtils.EMPTY);
+							result = conversation.getText().replace(matchedString, codeResponse).replaceAll("```",
+									StringUtils.EMPTY);
 
 						}
 						conversation.setText(escapeExceptPreAndEmoji(result));
@@ -73,7 +68,18 @@ public class GeminiDataBean {
 				});
 	}
 
-	public String escapeExceptPreAndEmoji(String htmlText) {
+	private String mapHtmlCodeIfNeeded(String htmlText) {
+		String convertedString = htmlText;
+		for (String prefix : PREFIXES) {
+			if (htmlText.startsWith(prefix)) {
+				convertedString = StringEscapeUtils.escapeHtml(htmlText);
+				break;
+			}
+		}
+		return convertedString;
+	}
+
+	private String escapeExceptPreAndEmoji(String htmlText) {
 		Pattern preTagPattern = Pattern.compile(PRE_TAG_PATTERN, Pattern.DOTALL);
 		Matcher matcher = preTagPattern.matcher(htmlText);
 		StringBuilder result = new StringBuilder();
