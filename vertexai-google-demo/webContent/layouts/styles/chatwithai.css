@@ -5,7 +5,7 @@
 	max-height: 300px; /* Set the maximum height for the div */
 }
 
-.text-editor {
+#editor {
 	width: 100%;
 }
 

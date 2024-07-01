@@ -48,7 +48,7 @@ public class GeminiDataBean {
 		Pattern pattern = Pattern.compile(CODE_RESPONSE_PATTERN, Pattern.DOTALL);
 		conversations.stream().filter(conversation -> BooleanUtils.isNotTrue(conversation.getIsEntityConverted()))
 				.forEach(conversation -> {
-					if (conversation.getRole().equals(Role.MODEL.getName())) {
+					if (Role.MODEL.getName().equals(conversation.getRole())) {
 						String result = conversation.getText();
 						Matcher matcher = pattern.matcher(conversation.getText());
 						List<String> matchedStrings = new ArrayList<>();
