@@ -1,0 +1,14 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "role": "model",
+        "parts": [
+          {
+            "text": "Hello! What can I do for you today?"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -11,8 +11,7 @@
       <directory>.</directory>
       <includes>
         <include>product.json</include>
-        <include>openapi.json</include>
-        <include>**/*.png</include>
+        <include>**/*.jpg</include>
       </includes>
     </fileSet>
     <fileSet>

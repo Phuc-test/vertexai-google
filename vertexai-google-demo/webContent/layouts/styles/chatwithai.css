@@ -1,0 +1,58 @@
+#article-content {
+	width: 100%; /* Set the desired width */
+	overflow-x: auto; /* Enable horizontal scrolling if needed */
+	overflow-y: auto; /* Enable vertical scrolling if needed */
+	max-height: 300px; /* Set the maximum height for the div */
+}
+
+#editor {
+	width: 100%;
+}
+
+.user-label {
+	font-weight: bold;
+	background-color: #39563e;
+	color: white;
+	font-family: 'Helvetica Neue', sans-serif;
+	padding: 10px 20px;
+	border-radius: 20px;
+}
+
+.model-label {
+	font-weight: bold;
+	background-color: #202f58;
+	color: white;
+	font-family: 'Helvetica Neue', sans-serif;
+	padding: 10px 20px;
+	border-radius: 20px;
+}
+
+.output-text {
+	background-color: var(--surface-a);
+	white-space: pre-line;
+	display: block;
+	padding: 10px 20px;
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Ensure it takes the full height of the viewport */
+}
+
+.ui-panelgrid-blank {
+    flex: 1; /* Make the panel grid take available space */
+    overflow-y: auto; /* Add scroll if content overflows */
+}
+
+.form-bottom {
+    display: flex;
+    flex-direction: column;
+    margin-top: auto; /* Push this section to the bottom */
+}
+
+.command-btns {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px; /* Add some spacing between the editor and buttons */
+}
