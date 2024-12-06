@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://json-schema.axonivy.com/app/12.0.0/variables.json
+# == Variables ==
+# 
+# You can define here your project Variables.
+# If you want to define/override a Variable for a specific Environment, 
+# add an additional ‘variables.yaml’ file in a subdirectory in the ‘Config’ folder: 
+# '<project>/Config/_<environment>/variables.yaml
+#
+
+# Example Variables:
+#  gemini:
+#    apiKey: 'AIzaSyDax'
+#  vertexai-gemini:
+#    projectId: 'generate-text-from-image'
+#    location: 'us-east1'
+#    modelName: 'gemini-1.5-pro-preview-0409'
+#    keyFilePath: 'D:/Credentials/generate-images-for-process-27dba695f5f5.json' (absolute url) 
+#    or keyFilePath: 'configuration/data/generate-images-for-process-27dba695f5f5.json' (relative url)
+
+Variables:
+  gemini:
+    # The Api gemini key that get from https://aistudio.google.com/app/apikey.
+    apiKey: ''
+  vertexai-gemini:
+    # The project id from project that is created in google cloud.
+    projectId: ''
+    # The region zone of the project https://cloud.google.com/compute/docs/regions-zones.
+    location: ''
+    # The resourceId of gemini model that we want to use (https://console.cloud.google.com/vertex-ai/publishers/google/model-garden/gemini-1.5-pro-001)
+    modelName: ''
+    # The full url of the credential json file.
+    keyFilePath: ''

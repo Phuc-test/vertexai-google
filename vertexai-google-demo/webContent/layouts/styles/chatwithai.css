@@ -1,0 +1,78 @@
+#article-content {
+	width: 100%;
+	overflow-x: auto;
+	overflow-y: auto;
+	max-height: 300px;
+}
+
+#editor {
+	width: 100%;
+}
+
+.user-label {
+	font-weight: bold;
+	background-color: #39563e;
+	color: white;
+	font-family: 'Helvetica Neue', sans-serif;
+	padding: 10px 20px;
+	border-radius: 20px;
+}
+
+.model-label {
+	font-weight: bold;
+	background-color: #202f58;
+	color: white;
+	font-family: 'Helvetica Neue', sans-serif;
+	padding: 10px 20px;
+	border-radius: 20px;
+}
+
+.output-text {
+	background-color: var(--surface-a);
+	white-space: pre-line;
+	display: block;
+	padding: 10px 20px;
+}
+
+.form-container {
+	display: flex;
+	flex-direction: column;
+	height: 95vh;
+}
+
+.ui-panelgrid-blank {
+	flex: 1;
+	overflow-y: auto;
+}
+
+.form-bottom {
+	display: flex;
+	flex-direction: column;
+	margin-top: auto;
+}
+
+.command-btns {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 10px;
+}
+
+.cancel-error-dialog-button {
+	display: flex;
+	justify-content: flex-end;
+}
+
+.icon-error-message {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.error-message {
+	font-size: 14px;
+}
+
+i {
+	font-size: 24px !important;
+	color: orange;
+}
